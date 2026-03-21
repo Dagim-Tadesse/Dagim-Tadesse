@@ -1,16 +1,39 @@
-## Hi there 👋
+# Hi 👋, I'm Dagim Tadesse
 
-<!--
-**Dagim-Tadesse/Dagim-Tadesse** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+🎓 4th Year Software Engineering Student  
+💻 Passionate about building real-world systems  
+🚀 Currently working on a Hotel Management System  
 
-Here are some ideas to get you started:
+---
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+## 🛠️ Tech Stack
+- Java
+- Python
+- PostgreSQL
+- React
+
+---
+
+## 📫 Contact Me
+- Email: your-email
+- LinkedIn: your-link
+
+![GitHub Stats](https://github-readme-stats.vercel.app/api?username=Dagim-Tadesse&show_icons=true)
+![GitHub Streak](https://streak-stats.demolab.com/?user=Dagim-Tadesse)
+![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=Dagim-Tadesse&layout=compact)
+![Typing SVG](https://readme-typing-svg.herokuapp.com?lines=Software+Engineer;Java+Developer;Building+Real+Projects)
+## 🚀 Featured Projects
+
+### 🏨 Hotel Management System
+- Java + MySQL
+- Booking, billing, guest management
+- GUI + CLI versions
+
+### 🍽️ Restaurant Website (In Progress)
+- Modern frontend design
+- Online ordering system
+
+### 💰 Expense Tracker
+- Track income and expenses
+- PostgreSQL backend
+
