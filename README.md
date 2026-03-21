@@ -15,8 +15,7 @@
 ---
 
 ## 📫 Contact Me
-- Email: your-email
-- LinkedIn: your-link
+- Email: Dagimtadesse25@gmail.com
 
 ![GitHub Stats](https://github-readme-stats.vercel.app/api?username=Dagim-Tadesse&show_icons=true)
 ![GitHub Streak](https://streak-stats.demolab.com/?user=Dagim-Tadesse)
