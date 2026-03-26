@@ -84,6 +84,7 @@
 ## 📫 Contact Me
 
 📧 Email: **[Dagimtadesse25@gmail.com](mailto:Dagimtadesse25@gmail.com)**
+linkedin: **https://www.linkedin.com/in/dagim-tadesse-ba6b30263/**
 
 ---
 
