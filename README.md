@@ -29,12 +29,12 @@
 ## 📊 GitHub Stats
 
 <p align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=Dagim-Tadesse&show_icons=true&theme=tokyonight&hide_border=true" height="160"/>
+  <img src="https://github-readme-stats.vercel.app/api?username=Dagim-Tadesse&show_icons=true&theme=tokyonight&hide_border=true&cache_seconds=1800" height="160"/>
   <img src="https://streak-stats.demolab.com?user=Dagim-Tadesse&theme=tokyonight&hide_border=true" height="160"/>
 </p>
 
 <p align="center">
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=Dagim-Tadesse&layout=compact&theme=tokyonight&hide_border=true" height="160"/>
+  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=Dagim-Tadesse&layout=compact&theme=tokyonight&hide_border=true&cache_seconds=1800" height="160"/>
 </p>
 
 ---
@@ -42,7 +42,7 @@
 ## 🏆 Achievements
 
 <p align="center">
-  <img src="https://github-profile-trophy.vercel.app/?username=Dagim-Tadesse&theme=tokyonight&no-frame=true&row=1&column=6"/>
+  <img src="https://github-profile-trophy.vercel.app/?username=Dagim-Tadesse&theme=onedark&no-frame=true&margin-w=10&row=1"/>
 </p>
 
 ---
