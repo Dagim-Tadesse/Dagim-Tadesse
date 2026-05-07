@@ -161,8 +161,8 @@ a{color:#0a8a8a;text-decoration:none}
       }`}
     >
       <nav className="max-w-7xl mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
-        <a href="#top" className="font-display text-xl font-bold tracking-tight">
-          <span className="text-primary">D</span>T<span className="text-primary">.</span>
+        <a href="#top" className="font-display text-xl font-bold tracking-tight inline-flex items-center">
+          <img src="/logo.jpg" alt="Dagim Tadesse" className="h-8 w-auto rounded-sm" />
         </a>
         <div className="hidden md:flex items-center gap-8 text-sm font-mono text-muted-foreground">
           {NAV.map((n) => (
@@ -199,6 +199,7 @@ function Hero() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], [0, 120]);
   const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
+  const buttonOpacity = useTransform(scrollYProgress, [0, 0.25, 0.6], [1, 1, 0]);
   return (
     <section id="top" ref={ref} className="relative min-h-screen flex items-center overflow-hidden noise">
       <div className="absolute inset-0 grid-bg [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" />
@@ -232,6 +233,7 @@ function Hero() {
           Software Engineering student at AASTU · ML/AI enthusiast · Odoo ERP specialist · Open to internships
         </motion.p>
         <motion.div
+          style={{ opacity: buttonOpacity }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.45 }}
