@@ -4,6 +4,6 @@ export const config = {
   runtime: "edge",
 };
 
-export default async function handler(request: Request): Promise<Response> {
+export default async function handler(request) {
   return server.fetch(request, {}, {});
 }
