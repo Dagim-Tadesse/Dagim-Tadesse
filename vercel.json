@@ -1,8 +1,8 @@
 {
   "buildCommand": "npm run build",
-  "outputDirectory": ".output/public",
+  "outputDirectory": "dist/client",
   "framework": "vite",
   "serverFunctions": {
-    "directory": ".output/server"
+    "directory": "dist/server"
   }
 }
