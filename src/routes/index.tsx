@@ -18,6 +18,7 @@ import {
   Wrench,
   Layers,
   Globe,
+  Download,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -36,7 +37,6 @@ const NAV = [
 const PROJECTS = [
   {
     name: "PriceGuard-AI",
-    badge: "🏆 2nd Place — GDG AASTU AI/ML Hackathon",
     tagline: "AI-powered price recommendation engine",
     description:
       "Built under hackathon pressure and deployed live. Helps buyers, sellers, and admins track product prices over time and delivers an AI-backed recommendation: buy now, or wait. Combines price-history inspection with an ML recommendation layer.",
@@ -105,13 +105,23 @@ function Nav() {
             </a>
           ))}
         </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5 text-xs font-mono">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={exportCV}
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/40 bg-primary/10 hover:bg-primary/20 text-xs font-mono text-primary transition"
+            aria-label="Export CV as PDF"
+          >
+            <Download className="h-3 w-3" />
+            Export CV
+          </button>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5 text-xs font-mono">
           <span className="relative flex h-2 w-2">
             <span className="absolute inset-0 rounded-full bg-primary animate-ping opacity-75" />
             <span className="relative rounded-full h-2 w-2 bg-primary" />
           </span>
           <span className="hidden sm:inline text-foreground/90">Open to Internships</span>
           <span className="sm:hidden text-foreground/90">Open</span>
+          </div>
         </div>
       </nav>
     </header>
@@ -226,8 +236,8 @@ function About() {
   const stats = [
     { v: "3.56", l: "CGPA" },
     { v: "Final", l: "Year (2 mo to 5th)" },
-    { v: "3+", l: "Live Projects" },
-    { v: "2nd", l: "Hackathon Place" },
+    { v: "5+", l: "Live Projects" },
+    { v: "AI/ML", l: "Focus Track" },
   ];
   return (
     <section id="about" className="relative py-28 md:py-40 px-6 lg:px-10">
@@ -244,8 +254,8 @@ function About() {
               </p>
               <p>
                 I build things that are <span className="text-primary">live and usable</span> — finance trackers, AI
-                price tools, flashcard apps — and compete in AI/ML hackathons. I placed 2nd in the GDG AASTU AI/ML
-                Hackathon with PriceGuard-AI and I'm 50% through the GDG structured ML curriculum.
+                price tools, flashcard apps — and compete in AI/ML hackathons. I'm 50% through the GDG structured ML
+                curriculum and shipping projects every month.
               </p>
               <p>
                 Driven by curiosity, disciplined by habit, and looking for an internship where I can work on real
@@ -439,17 +449,11 @@ function Experience() {
   ];
   const achievements = [
     {
-      icon: Trophy,
-      title: "2nd Place — GDG AASTU AI/ML Hackathon",
-      sub: "PriceGuard-AI · 2025",
-      desc: "Built and deployed an ML-powered price recommendation tool, placing 2nd in the AI/ML track.",
-      featured: true,
-    },
-    {
       icon: Award,
       title: "Cardano Blockchain Hackathon Participant",
       sub: "Blockchain Developer · Team CATs Group 2",
       desc: "Worked on smart contracts and blockchain application logic under competition conditions.",
+      featured: true,
     },
   ];
   return (
