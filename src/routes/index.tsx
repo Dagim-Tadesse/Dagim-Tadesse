@@ -197,23 +197,12 @@ a{color:#0a8a8a;text-decoration:none}
 
 function Hero() {
   const ref = useRef<HTMLDivElement>(null);
-  const [isClient, setIsClient] = useState(false);
-  
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  // Only use scroll tracking on client
-  const { scrollYProgress } = isClient ? useScroll({ target: ref, offset: ["start start", "end start"] }) : { scrollYProgress: { get: () => 0 } };
-  const y = isClient ? useTransform(scrollYProgress, [0, 1], [0, 120]) : 0;
-  const opacity = isClient ? useTransform(scrollYProgress, [0, 1], [1, 0]) : 1;
-  const buttonOpacity = isClient ? useTransform(scrollYProgress, [0, 0.5, 0.85], [1, 1, 0]) : 1;
   
   return (
     <section id="top" ref={ref} className="relative min-h-screen flex items-center overflow-hidden noise">
       <div className="absolute inset-0 grid-bg [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" />
       <div className="absolute inset-0 radial-glow" />
-      <motion.div style={{ y, opacity }} className="relative max-w-7xl mx-auto px-6 lg:px-10 w-full pt-24">
+      <motion.div className="relative max-w-7xl mx-auto px-6 lg:px-10 w-full pt-24">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -242,7 +231,6 @@ function Hero() {
           Software Engineering student at AASTU · ML/AI enthusiast · Odoo ERP specialist · Open to internships
         </motion.p>
         <motion.div
-          style={{ opacity: buttonOpacity }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.45 }}
