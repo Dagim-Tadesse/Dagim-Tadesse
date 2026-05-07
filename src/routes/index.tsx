@@ -18,6 +18,7 @@ import {
   Wrench,
   Layers,
   Globe,
+  Download,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -36,7 +37,6 @@ const NAV = [
 const PROJECTS = [
   {
     name: "PriceGuard-AI",
-    badge: "🏆 2nd Place — GDG AASTU AI/ML Hackathon",
     tagline: "AI-powered price recommendation engine",
     description:
       "Built under hackathon pressure and deployed live. Helps buyers, sellers, and admins track product prices over time and delivers an AI-backed recommendation: buy now, or wait. Combines price-history inspection with an ML recommendation layer.",
@@ -82,6 +82,72 @@ const SKILLS = [
 ];
 
 function Nav() {
+  const exportCV = () => {
+    const html = `<!doctype html><html><head><meta charset="utf-8"/><title>Dagim Tadesse — CV</title>
+<style>
+*{box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;color:#0a0a0f;max-width:780px;margin:32px auto;padding:0 32px;line-height:1.45;font-size:13px}
+h1{font-size:28px;margin:0 0 4px;letter-spacing:-0.02em}
+h2{font-size:13px;text-transform:uppercase;letter-spacing:.18em;color:#0a8a8a;margin:22px 0 8px;border-bottom:1px solid #ddd;padding-bottom:4px}
+h3{font-size:14px;margin:10px 0 2px}
+.meta{color:#555;font-size:12px;margin-bottom:6px}
+.row{display:flex;justify-content:space-between;gap:12px;margin-top:8px}
+.muted{color:#666;font-size:12px}
+ul{margin:6px 0 0;padding-left:18px}
+li{margin:2px 0}
+.tags{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#444}
+a{color:#0a8a8a;text-decoration:none}
+@media print{body{margin:0;padding:18px 24px}}
+</style></head><body>
+<header>
+  <h1>Dagim Tadesse</h1>
+  <div class="meta">Software Engineer · AI/ML Developer · Addis Ababa, Ethiopia</div>
+  <div class="meta">dagimtadesse25@gmail.com · github.com/Dagim-Tadesse · linkedin.com/in/dagim-tadesse-ba6b30263</div>
+</header>
+<h2>Summary</h2>
+<p>Final-year Software Engineering student at AASTU (CGPA 3.56). Build live, full-stack and AI/ML products. Currently contracted as Odoo Designer for AI training datasets at ConDigital Inc. Open to internships in AI/ML or full-stack engineering.</p>
+<h2>Experience</h2>
+<h3>Odoo Designer — AI Training Datasets · ConDigital Inc.</h3>
+<div class="muted">Contractor · Current · Addis Ababa, Ethiopia</div>
+<ul><li>Designing Odoo Website &amp; CRM content and data funnels for AI training datasets.</li>
+<li>SEO optimization, lead-gen tagging, data-driven content across multiple client builds.</li></ul>
+<h3>AI/ML Student — GDG Program · Google Developer Groups, AASTU Chapter</h3>
+<div class="muted">Nov 2025 – Present (50% complete)</div>
+<ul><li>Structured AI/ML curriculum: data handling, ML fundamentals, model training, applied Python.</li></ul>
+<h2>Selected Projects</h2>
+<h3>PriceGuard-AI <span class="muted">— price-guard-ai.vercel.app</span></h3>
+<p>AI-powered price recommendation engine. Tracks product prices over time and recommends buy-now or wait. <span class="tags">Python · React · AI/ML · Vercel</span></p>
+<h3>SpendWise <span class="muted">— spend-wise-bydagim.vercel.app</span></h3>
+<p>Mobile-first React + TypeScript finance app on Supabase with real auth and live database. <span class="tags">React · TypeScript · Supabase</span></p>
+<h3>Spark Study <span class="muted">— spark-study-vert.vercel.app</span></h3>
+<p>Vite + React + TypeScript flashcard workspace with full deck management and live preview. <span class="tags">Vite · React · TypeScript</span></p>
+<h3>Cardano Blockchain Hackathon — CATs Group 2</h3>
+<p>Smart contract developer working on Cardano blockchain application logic. <span class="tags">Cardano · Smart Contracts</span></p>
+<h2>Skills</h2>
+<ul>
+<li><b>Languages:</b> Python, Java, C++, TypeScript, JavaScript, PHP</li>
+<li><b>Frontend:</b> React, Vite, HTML/CSS, Responsive Design</li>
+<li><b>AI / Data:</b> Machine Learning, Data Preprocessing, Model Training</li>
+<li><b>Backend / DB:</b> Supabase, MySQL, MS SQL Server, REST APIs</li>
+<li><b>ERP / Odoo:</b> Odoo Website, Odoo CRM, AI Dataset Design</li>
+<li><b>Tools:</b> Git, GitHub, Vercel, VS Code, Cardano</li>
+</ul>
+<h2>Education</h2>
+<h3>B.Sc. Software Engineering — AASTU</h3>
+<div class="muted">Expected June 2027 · CGPA 3.56</div>
+<h2>Certifications</h2>
+<ul><li>C++ Programming — SoloLearn</li><li>Web Development — FreeCodeCamp</li></ul>
+<script>window.onload=()=>setTimeout(()=>window.print(),300)</script>
+</body></html>`;
+    const blob = new Blob([html], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "Dagim-Tadesse-CV.html";
+    a.click();
+    window.open(url, "_blank");
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  };
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -105,13 +171,23 @@ function Nav() {
             </a>
           ))}
         </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5 text-xs font-mono">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={exportCV}
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/40 bg-primary/10 hover:bg-primary/20 text-xs font-mono text-primary transition"
+            aria-label="Export CV as PDF"
+          >
+            <Download className="h-3 w-3" />
+            Export CV
+          </button>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5 text-xs font-mono">
           <span className="relative flex h-2 w-2">
             <span className="absolute inset-0 rounded-full bg-primary animate-ping opacity-75" />
             <span className="relative rounded-full h-2 w-2 bg-primary" />
           </span>
           <span className="hidden sm:inline text-foreground/90">Open to Internships</span>
           <span className="sm:hidden text-foreground/90">Open</span>
+          </div>
         </div>
       </nav>
     </header>
@@ -226,8 +302,8 @@ function About() {
   const stats = [
     { v: "3.56", l: "CGPA" },
     { v: "Final", l: "Year (2 mo to 5th)" },
-    { v: "3+", l: "Live Projects" },
-    { v: "2nd", l: "Hackathon Place" },
+    { v: "5+", l: "Live Projects" },
+    { v: "AI/ML", l: "Focus Track" },
   ];
   return (
     <section id="about" className="relative py-28 md:py-40 px-6 lg:px-10">
@@ -244,8 +320,8 @@ function About() {
               </p>
               <p>
                 I build things that are <span className="text-primary">live and usable</span> — finance trackers, AI
-                price tools, flashcard apps — and compete in AI/ML hackathons. I placed 2nd in the GDG AASTU AI/ML
-                Hackathon with PriceGuard-AI and I'm 50% through the GDG structured ML curriculum.
+                price tools, flashcard apps — and compete in AI/ML hackathons. I'm 50% through the GDG structured ML
+                curriculum and shipping projects every month.
               </p>
               <p>
                 Driven by curiosity, disciplined by habit, and looking for an internship where I can work on real
@@ -439,17 +515,11 @@ function Experience() {
   ];
   const achievements = [
     {
-      icon: Trophy,
-      title: "2nd Place — GDG AASTU AI/ML Hackathon",
-      sub: "PriceGuard-AI · 2025",
-      desc: "Built and deployed an ML-powered price recommendation tool, placing 2nd in the AI/ML track.",
-      featured: true,
-    },
-    {
       icon: Award,
       title: "Cardano Blockchain Hackathon Participant",
       sub: "Blockchain Developer · Team CATs Group 2",
       desc: "Worked on smart contracts and blockchain application logic under competition conditions.",
+      featured: true,
     },
   ];
   return (
