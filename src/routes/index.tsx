@@ -269,13 +269,14 @@ function Hero() {
   );
 }
 
-function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+function Reveal({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.6, delay, ease: [0.21, 0.47, 0.32, 0.98] }}
+      className={className}
     >
       {children}
     </motion.div>
@@ -310,8 +311,8 @@ function About() {
       <div className="max-w-7xl mx-auto">
         <SectionHeading tag="01 / About" title="A serious young engineer, not a student template." />
         <div className="grid lg:grid-cols-5 gap-10 lg:gap-16">
-          <Reveal>
-            <div className="lg:col-span-3 space-y-5 text-base md:text-lg leading-relaxed text-muted-foreground">
+              <Reveal className="lg:col-span-3">
+                <div className="space-y-5 text-base md:text-lg leading-relaxed text-muted-foreground">
               <p>
                 I'm a final-year Software Engineering student at{" "}
                 <span className="text-foreground">Addis Ababa Science and Technology University</span> (CGPA 3.56),
@@ -333,8 +334,8 @@ function About() {
               </div>
             </div>
           </Reveal>
-          <Reveal delay={0.15}>
-            <div className="lg:col-span-2 grid grid-cols-2 gap-4">
+              <Reveal delay={0.15} className="lg:col-span-2">
+                <div className="grid grid-cols-2 gap-4">
               {stats.map((s) => (
                 <div
                   key={s.l}
@@ -373,8 +374,8 @@ function ProjectCard({
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.6, delay: index * 0.08 }}
       className={`group relative rounded-3xl border border-border bg-surface p-7 md:p-9 overflow-hidden accent-glow transition-all duration-500 hover:-translate-y-1 ${
-        large ? "lg:col-span-2 lg:row-span-2" : ""
-      }`}
+          large ? "md:col-span-2 md:row-span-2 lg:col-span-2 lg:row-span-2" : ""
+        }`} 
     >
       {large && (
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent pointer-events-none" />
@@ -444,9 +445,9 @@ function Projects() {
     <section id="projects" className="relative py-28 md:py-40 px-6 lg:px-10 bg-gradient-to-b from-transparent via-surface/30 to-transparent">
       <div className="max-w-7xl mx-auto">
         <SectionHeading tag="02 / Selected Work" title="Live products. Real users. Hackathon-tested." />
-        <div className="grid lg:grid-cols-3 gap-5 md:gap-6 auto-rows-fr">
+        <div className="grid md:grid-cols-2 gap-5 md:gap-6 auto-rows-fr">
           {PROJECTS.map((p, i) => (
-            <ProjectCard key={p.name} p={p} large={p.hero} index={i} />
+            <ProjectCard key={p.name} p={p} index={i} />
           ))}
         </div>
       </div>
