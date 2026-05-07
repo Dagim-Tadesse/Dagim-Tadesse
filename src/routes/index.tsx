@@ -197,10 +197,18 @@ a{color:#0a8a8a;text-decoration:none}
 
 function Hero() {
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], [0, 120]);
-  const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
-  const buttonOpacity = useTransform(scrollYProgress, [0, 0.5, 0.85], [1, 1, 0]);
+  const [isClient, setIsClient] = useState(false);
+  
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Only use scroll tracking on client
+  const { scrollYProgress } = isClient ? useScroll({ target: ref, offset: ["start start", "end start"] }) : { scrollYProgress: { get: () => 0 } };
+  const y = isClient ? useTransform(scrollYProgress, [0, 1], [0, 120]) : 0;
+  const opacity = isClient ? useTransform(scrollYProgress, [0, 1], [1, 0]) : 1;
+  const buttonOpacity = isClient ? useTransform(scrollYProgress, [0, 0.5, 0.85], [1, 1, 0]) : 1;
+  
   return (
     <section id="top" ref={ref} className="relative min-h-screen flex items-center overflow-hidden noise">
       <div className="absolute inset-0 grid-bg [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" />
