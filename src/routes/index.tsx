@@ -150,15 +150,16 @@ a{color:#0a8a8a;text-decoration:none}
   };
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
   return (
     <header
-      className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
-        scrolled ? "backdrop-blur-xl bg-background/70 border-b border-border" : ""
+      className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 delay-100 ${
+        scrolled ? "backdrop-blur-xl bg-background/40 border-b border-border/30" : ""
       }`}
+      style={{ WebkitBackdropFilter: scrolled ? "blur(10px)" : undefined }}
     >
       <nav className="max-w-7xl mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
         <a href="#top" className="font-display text-xl font-bold tracking-tight inline-flex items-center">
@@ -199,7 +200,7 @@ function Hero() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], [0, 120]);
   const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
-  const buttonOpacity = useTransform(scrollYProgress, [0, 0.25, 0.6], [1, 1, 0]);
+  const buttonOpacity = useTransform(scrollYProgress, [0, 0.5, 0.85], [1, 1, 0]);
   return (
     <section id="top" ref={ref} className="relative min-h-screen flex items-center overflow-hidden noise">
       <div className="absolute inset-0 grid-bg [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" />
