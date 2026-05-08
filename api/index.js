@@ -1,4 +1,6 @@
 import server from "../dist/server/server.js";
+import fs from "fs";
+import path from "path";
 
 export const config = {
   runtime: "nodejs",
@@ -12,14 +14,33 @@ export default async function handler(request) {
   let timeoutId;
   const timeoutPromise = new Promise((_, reject) => {
     timeoutId = setTimeout(() => {
-      reject(new Error("SSR rendering timeout after 20 seconds"));
-    }, 20000);
+      reject(new Error("SSR rendering timeout after 8 seconds"));
+    }, 8000);
   });
 
   try {
-    // Ensure the request URL is absolute. Some platforms (dev servers)
-    // provide a path-only URL ("/"), which breaks libraries that call
-    // `new URL(request.url)`. Build a full URL using the Host header.
+    // Serve a favicon directly from the repo to avoid routing it through SSR.
+    try {
+      const reqPath = typeof request.url === "string" ? new URL(request.url, "http://localhost").pathname : "/";
+      if (reqPath === "/favicon.ico") {
+        const faviconSource = path.join(process.cwd(), "logo.jpg");
+        if (fs.existsSync(faviconSource)) {
+          const body = fs.readFileSync(faviconSource);
+          // Clear the SSR timeout since we're returning synchronously here.
+          if (typeof timeoutId !== 'undefined') clearTimeout(timeoutId);
+          return new Response(body, {
+            status: 200,
+            headers: {
+              "Content-Type": "image/jpeg",
+              "Cache-Control": "public, max-age=86400"
+            }
+          });
+        }
+      }
+    } catch (e) {
+      console.warn('[API Handler] favicon serve error', e && e.message);
+    }
+
     const getHeader = (name) => {
       if (request.headers && typeof request.headers.get === "function") return request.headers.get(name);
       if (request.headers && (request.headers[name] || request.headers[name.toLowerCase()])) return request.headers[name] || request.headers[name.toLowerCase()];
@@ -30,7 +51,6 @@ export default async function handler(request) {
     const protocol = host.includes("localhost") ? "http" : "https";
     const fullUrl = new URL(request.url, `${protocol}://${host}`).toString();
 
-    // Normalize headers for forwarding (support Headers or plain object)
     let forwardHeaders;
     if (request.headers && typeof request.headers.get === "function") {
       forwardHeaders = request.headers;
@@ -38,8 +58,6 @@ export default async function handler(request) {
       forwardHeaders = new Headers(request.headers || {});
     }
 
-    // Create a new Request with the absolute URL while preserving method/headers/body.
-    // GET and HEAD requests must not include a body.
     const requestInit = {
       method: request.method || "GET",
       headers: forwardHeaders,
@@ -60,7 +78,6 @@ export default async function handler(request) {
     clearTimeout(timeoutId);
     console.error("[API Handler ERROR]", error.message);
     
-    // Return a basic HTML error response with 503 Service Unavailable
     return new Response(
       `<!DOCTYPE html>
 <html>
