@@ -16,7 +16,21 @@ export default async function handler(request) {
   });
 
   try {
-    const fetchPromise = Promise.resolve(server.fetch(request, {}, {}));
+    // Ensure the request URL is absolute. Some platforms (dev servers)
+    // provide a path-only URL ("/"), which breaks libraries that call
+    // `new URL(request.url)`. Build a full URL using the Host header.
+    const host = request.headers.get("host") || "localhost:3000";
+    const protocol = host.includes("localhost") ? "http" : "https";
+    const fullUrl = new URL(request.url, `${protocol}://${host}`).toString();
+
+    // Create a new Request with the absolute URL while preserving method/headers/body
+    const forwardedRequest = new Request(fullUrl, {
+      method: request.method,
+      headers: request.headers,
+      body: request.body,
+    });
+
+    const fetchPromise = Promise.resolve(server.fetch(forwardedRequest, {}, {}));
     const response = await Promise.race([fetchPromise, timeoutPromise]);
     console.log("[API Handler SUCCESS]", response.status);
     return response;
