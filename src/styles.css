@@ -41,8 +41,8 @@
 :root {
   --radius: 0.5rem;
   /* Editorial dark theme */
-  --background: oklch(0.14 0.015 260);          /* #0A0A0F-ish */
-  --foreground: oklch(0.97 0.005 240);          /* off-white */
+  --background: oklch(0.14 0.015 260); /* #0A0A0F-ish */
+  --foreground: oklch(0.97 0.005 240); /* off-white */
   --surface: oklch(0.18 0.018 260);
   --surface-elevated: oklch(0.22 0.02 260);
   --card: oklch(0.18 0.018 260);
@@ -77,8 +77,12 @@
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
-  html { scroll-behavior: smooth; }
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
@@ -93,9 +97,16 @@
 }
 
 @layer utilities {
-  .font-display { font-family: var(--font-display); letter-spacing: -0.02em; }
-  .font-mono { font-family: var(--font-mono); }
-  .text-balance { text-wrap: balance; }
+  .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
 
   .grid-bg {
     background-image:
@@ -109,7 +120,9 @@
   }
 
   .accent-glow:hover {
-    box-shadow: 0 0 0 1px oklch(0.88 0.18 180 / 0.6), 0 20px 60px -20px oklch(0.88 0.18 180 / 0.35);
+    box-shadow:
+      0 0 0 1px oklch(0.88 0.18 180 / 0.6),
+      0 20px 60px -20px oklch(0.88 0.18 180 / 0.35);
   }
 
   .noise {
@@ -117,7 +130,8 @@
   }
   .noise::after {
     content: "";
-    position: absolute; inset: 0;
+    position: absolute;
+    inset: 0;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
     opacity: 0.04;
     pointer-events: none;

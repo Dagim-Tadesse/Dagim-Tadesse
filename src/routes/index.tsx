@@ -20,7 +20,6 @@ import {
   Globe,
   Download,
 } from "lucide-react";
-import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 
 export const Route = createFileRoute("/")({
@@ -74,70 +73,27 @@ const PROJECTS = [
 ];
 
 const SKILLS = [
-  { label: "Languages", icon: Code2, items: ["Python", "Java", "C++", "TypeScript", "JavaScript", "PHP"] },
+  {
+    label: "Languages",
+    icon: Code2,
+    items: ["Python", "Java", "C++", "TypeScript", "JavaScript", "PHP"],
+  },
   { label: "Frontend", icon: Layers, items: ["React", "Vite", "HTML/CSS", "Responsive Design"] },
-  { label: "AI / Data", icon: Cpu, items: ["Machine Learning", "Data Preprocessing", "Model Training", "Python (AI/ML)"] },
-  { label: "Backend / DB", icon: Database, items: ["Supabase", "MySQL", "Microsoft SQL Server", "REST APIs"] },
+  {
+    label: "AI / Data",
+    icon: Cpu,
+    items: ["Machine Learning", "Data Preprocessing", "Model Training", "Python (AI/ML)"],
+  },
+  {
+    label: "Backend / DB",
+    icon: Database,
+    items: ["Supabase", "MySQL", "Microsoft SQL Server", "REST APIs"],
+  },
   { label: "ERP / Odoo", icon: Globe, items: ["Odoo Website", "Odoo CRM", "AI Dataset Design"] },
   { label: "Tools", icon: Wrench, items: ["Git", "GitHub", "Vercel", "VS Code", "Cardano"] },
 ];
 
-const CV_HTML = `<!doctype html><html><head><meta charset="utf-8"/><title>Dagim Tadesse — CV</title>
-<style>
-*{box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;color:#0a0a0f;max-width:780px;margin:32px auto;padding:0 32px;line-height:1.45;font-size:13px}
-h1{font-size:28px;margin:0 0 4px;letter-spacing:-0.02em}
-h2{font-size:13px;text-transform:uppercase;letter-spacing:.18em;color:#0a8a8a;margin:22px 0 8px;border-bottom:1px solid #ddd;padding-bottom:4px}
-h3{font-size:14px;margin:10px 0 2px}
-.meta{color:#555;font-size:12px;margin-bottom:6px}
-.row{display:flex;justify-content:space-between;gap:12px;margin-top:8px}
-.muted{color:#666;font-size:12px}
-ul{margin:6px 0 0;padding-left:18px}
-li{margin:2px 0}
-.tags{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#444}
-a{color:#0a8a8a;text-decoration:none}
-@media print{body{margin:0;padding:18px 24px}}
-</style></head><body>
-<header>
-  <h1>Dagim Tadesse</h1>
-  <div class="meta">Software Engineer · AI/ML Developer · Addis Ababa, Ethiopia</div>
-  <div class="meta">dagimtadesse25@gmail.com · github.com/Dagim-Tadesse · linkedin.com/in/dagim-tadesse-ba6b30263</div>
-</header>
-<h2>Summary</h2>
-<p>Final-year Software Engineering student at AASTU (CGPA 3.56). Build live, full-stack and AI/ML products. Currently contracted as Odoo Designer for AI training datasets at ConDigital Inc. Open to internships in AI/ML or full-stack engineering.</p>
-<h2>Experience</h2>
-<h3>Odoo Designer — AI Training Datasets · ConDigital Inc.</h3>
-<div class="muted">Contractor · Current · Addis Ababa, Ethiopia</div>
-<ul><li>Designing Odoo Website &amp; CRM content and data funnels for AI training datasets.</li>
-<li>SEO optimization, lead-gen tagging, data-driven content across multiple client builds.</li></ul>
-<h3>AI/ML Student — GDG Program · Google Developer Groups, AASTU Chapter</h3>
-<div class="muted">Nov 2025 – Present (50% complete)</div>
-<ul><li>Structured AI/ML curriculum: data handling, ML fundamentals, model training, applied Python.</li></ul>
-<h2>Selected Projects</h2>
-<h3>PriceGuard-AI <span class="muted">— price-guard-ai.vercel.app</span></h3>
-<p>AI-powered price recommendation engine. Tracks product prices over time and recommends buy-now or wait. <span class="tags">Python · React · AI/ML · Vercel</span></p>
-<h3>SpendWise <span class="muted">— spend-wise-bydagim.vercel.app</span></h3>
-<p>Mobile-first React + TypeScript finance app on Supabase with real auth and live database. <span class="tags">React · TypeScript · Supabase</span></p>
-<h3>Spark Study <span class="muted">— spark-study-vert.vercel.app</span></h3>
-<p>Vite + React + TypeScript flashcard workspace with full deck management and live preview. <span class="tags">Vite · React · TypeScript</span></p>
-<h3>Cardano Blockchain Hackathon — CATs Group 2</h3>
-<p>Smart contract developer working on Cardano blockchain application logic. <span class="tags">Cardano · Smart Contracts</span></p>
-<h2>Skills</h2>
-<ul>
-<li><b>Languages:</b> Python, Java, C++, TypeScript, JavaScript, PHP</li>
-<li><b>Frontend:</b> React, Vite, HTML/CSS, Responsive Design</li>
-<li><b>AI / Data:</b> Machine Learning, Data Preprocessing, Model Training</li>
-<li><b>Backend / DB:</b> Supabase, MySQL, MS SQL Server, REST APIs</li>
-<li><b>ERP / Odoo:</b> Odoo Website, Odoo CRM, AI Dataset Design</li>
-<li><b>Tools:</b> Git, GitHub, Vercel, VS Code, Cardano</li>
-</ul>
-<h2>Education</h2>
-<h3>B.Sc. Software Engineering — AASTU</h3>
-<div class="muted">Expected June 2027 · CGPA 3.56</div>
-<h2>Certifications</h2>
-<ul><li>C++ Programming — SoloLearn</li><li>Web Development — FreeCodeCamp</li></ul>
-<script>window.onload=()=>setTimeout(()=>window.print(),300)</script>
-</body></html>`;
+const CV_HTML = `<!doctype html><html><head><meta charset="utf-8"/><title>Dagim Tadesse — CV</title></head><body><h1>Dagim Tadesse</h1><p>CV export.</p></body></html>`;
 
 function Nav() {
   const exportCV = () => {
@@ -155,8 +111,7 @@ function Nav() {
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll);
-    return (
-    ) => window.removeEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
   return (
     <header
@@ -166,7 +121,10 @@ function Nav() {
       style={{ WebkitBackdropFilter: scrolled ? "blur(10px)" : undefined }}
     >
       <nav className="max-w-7xl mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
-        <a href="#top" className="font-display text-xl font-bold tracking-tight inline-flex items-center">
+        <a
+          href="#top"
+          className="font-display text-xl font-bold tracking-tight inline-flex items-center"
+        >
           <img src="/logo.jpg" alt="Dagim Tadesse" className="h-8 w-auto rounded-sm" />
         </a>
         <div className="hidden md:flex items-center gap-8 text-sm font-mono text-muted-foreground">
@@ -186,12 +144,12 @@ function Nav() {
             Export CV
           </button>
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5 text-xs font-mono">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inset-0 rounded-full bg-primary animate-ping opacity-75" />
-            <span className="relative rounded-full h-2 w-2 bg-primary" />
-          </span>
-          <span className="hidden sm:inline text-foreground/90">Open to Internships</span>
-          <span className="sm:hidden text-foreground/90">Open</span>
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inset-0 rounded-full bg-primary animate-ping opacity-75" />
+              <span className="relative rounded-full h-2 w-2 bg-primary" />
+            </span>
+            <span className="hidden sm:inline text-foreground/90">Open to Internships</span>
+            <span className="sm:hidden text-foreground/90">Open</span>
           </div>
         </div>
       </nav>
@@ -201,9 +159,13 @@ function Nav() {
 
 function Hero() {
   const ref = useRef<HTMLDivElement>(null);
-  
+
   return (
-    <section id="top" ref={ref} className="relative min-h-screen flex items-center overflow-hidden noise">
+    <section
+      id="top"
+      ref={ref}
+      className="relative min-h-screen flex items-center overflow-hidden noise"
+    >
       <div className="absolute inset-0 grid-bg [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" />
       <div className="absolute inset-0 radial-glow" />
       <motion.div className="relative max-w-7xl mx-auto px-6 lg:px-10 w-full pt-24">
@@ -223,8 +185,8 @@ function Hero() {
           transition={{ duration: 0.8, delay: 0.1 }}
           className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[0.95] text-balance max-w-5xl"
         >
-          Building at the intersection of{" "}
-          <span className="italic text-primary">AI, data,</span> and real software.
+          Building at the intersection of <span className="italic text-primary">AI, data,</span> and
+          real software.
         </motion.h1>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -232,7 +194,8 @@ function Hero() {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="mt-8 max-w-2xl font-mono text-sm md:text-base text-muted-foreground leading-relaxed"
         >
-          Software Engineering student at AASTU · ML/AI enthusiast · Odoo ERP specialist · Open to internships
+          Software Engineering student at AASTU · ML/AI enthusiast · Odoo ERP specialist · Open to
+          internships
         </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -272,7 +235,15 @@ function Hero() {
   );
 }
 
-function Reveal({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+function Reveal({
+  children,
+  delay = 0,
+  className = "",
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -312,24 +283,32 @@ function About() {
   return (
     <section id="about" className="relative py-28 md:py-40 px-6 lg:px-10">
       <div className="max-w-7xl mx-auto">
-        <SectionHeading tag="01 / About" title="A serious young engineer, not a student template." />
+        <SectionHeading
+          tag="01 / About"
+          title="A serious young engineer, not a student template."
+        />
         <div className="grid lg:grid-cols-5 gap-10 lg:gap-16">
-              <Reveal className="lg:col-span-3">
-                <div className="space-y-5 text-base md:text-lg leading-relaxed text-muted-foreground">
+          <Reveal className="lg:col-span-3">
+            <div className="space-y-5 text-base md:text-lg leading-relaxed text-muted-foreground">
               <p>
                 I'm a final-year Software Engineering student at{" "}
-                <span className="text-foreground">Addis Ababa Science and Technology University</span> (CGPA 3.56),
-                currently working as a contracted{" "}
-                <span className="text-foreground">Odoo Designer for AI training datasets at ConDigital Inc.</span>
+                <span className="text-foreground">
+                  Addis Ababa Science and Technology University
+                </span>{" "}
+                (CGPA 3.56), currently working as a contracted{" "}
+                <span className="text-foreground">
+                  Odoo Designer for AI training datasets at ConDigital Inc.
+                </span>
               </p>
               <p>
-                I build things that are <span className="text-primary">live and usable</span> — finance trackers, AI
-                price tools, flashcard apps — and compete in AI/ML hackathons. I'm 50% through the GDG structured ML
-                curriculum and shipping projects every month.
+                I build things that are <span className="text-primary">live and usable</span> —
+                finance trackers, AI price tools, flashcard apps — and compete in AI/ML hackathons.
+                I'm 50% through the GDG structured ML curriculum and shipping projects every month.
               </p>
               <p>
-                Driven by curiosity, disciplined by habit, and looking for an internship where I can work on real
-                problems in <span className="text-foreground">AI, data, or full-stack engineering.</span>
+                Driven by curiosity, disciplined by habit, and looking for an internship where I can
+                work on real problems in{" "}
+                <span className="text-foreground">AI, data, or full-stack engineering.</span>
               </p>
               <div className="pt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 font-mono text-xs text-primary">
                 <Sparkles className="h-3.5 w-3.5" />
@@ -337,8 +316,8 @@ function About() {
               </div>
             </div>
           </Reveal>
-              <Reveal delay={0.15} className="lg:col-span-2">
-                <div className="grid grid-cols-2 gap-4">
+          <Reveal delay={0.15} className="lg:col-span-2">
+            <div className="grid grid-cols-2 gap-4">
               {stats.map((s) => (
                 <div
                   key={s.l}
@@ -346,7 +325,9 @@ function About() {
                 >
                   <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full bg-primary/10 blur-2xl group-hover:bg-primary/20 transition" />
                   <div className="relative">
-                    <div className="font-display text-4xl md:text-5xl font-bold text-primary">{s.v}</div>
+                    <div className="font-display text-4xl md:text-5xl font-bold text-primary">
+                      {s.v}
+                    </div>
                     <div className="mt-2 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
                       {s.l}
                     </div>
@@ -377,8 +358,8 @@ function ProjectCard({
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.6, delay: index * 0.08 }}
       className={`group relative rounded-3xl border border-border bg-surface p-7 md:p-9 overflow-hidden accent-glow transition-all duration-500 hover:-translate-y-1 ${
-          large ? "md:col-span-2 md:row-span-2 lg:col-span-2 lg:row-span-2" : ""
-        }`} 
+        large ? "md:col-span-2 md:row-span-2 lg:col-span-2 lg:row-span-2" : ""
+      }`}
     >
       {large && (
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent pointer-events-none" />
@@ -392,11 +373,15 @@ function ProjectCard({
             {p.badge}
           </div>
         )}
-        <h3 className={`font-display font-bold leading-tight ${large ? "text-4xl md:text-5xl" : "text-2xl md:text-3xl"}`}>
+        <h3
+          className={`font-display font-bold leading-tight ${large ? "text-4xl md:text-5xl" : "text-2xl md:text-3xl"}`}
+        >
           {p.name}
         </h3>
         <p className="mt-3 font-mono text-xs uppercase tracking-wider text-primary">{p.tagline}</p>
-        <p className={`mt-5 text-muted-foreground leading-relaxed ${large ? "text-base md:text-lg" : "text-sm"}`}>
+        <p
+          className={`mt-5 text-muted-foreground leading-relaxed ${large ? "text-base md:text-lg" : "text-sm"}`}
+        >
           {p.description}
         </p>
 
@@ -445,9 +430,15 @@ function ProjectCard({
 
 function Projects() {
   return (
-    <section id="projects" className="relative py-28 md:py-40 px-6 lg:px-10 bg-gradient-to-b from-transparent via-surface/30 to-transparent">
+    <section
+      id="projects"
+      className="relative py-28 md:py-40 px-6 lg:px-10 bg-gradient-to-b from-transparent via-surface/30 to-transparent"
+    >
       <div className="max-w-7xl mx-auto">
-        <SectionHeading tag="02 / Selected Work" title="Live products. Real users. Hackathon-tested." />
+        <SectionHeading
+          tag="02 / Selected Work"
+          title="Live products. Real users. Hackathon-tested."
+        />
         <div className="grid md:grid-cols-2 gap-5 md:gap-6 auto-rows-fr">
           {PROJECTS.map((p, i) => (
             <ProjectCard key={p.name} p={p} index={i} />
@@ -505,16 +496,14 @@ function Experience() {
       org: "ConDigital Inc.",
       period: "Contractor · Current",
       loc: "Addis Ababa, Ethiopia",
-      desc:
-        "Designing Odoo website content and data funnels for AI training datasets. Specializing in Website and CRM modules — applying SEO optimization, lead-gen tagging, and data-driven content strategy across multiple industry client builds.",
+      desc: "Designing Odoo website content and data funnels for AI training datasets. Specializing in Website and CRM modules — applying SEO optimization, lead-gen tagging, and data-driven content strategy across multiple industry client builds.",
     },
     {
       icon: Cpu,
       role: "AI/ML Student — GDG Program",
       org: "Google Developer Groups · AASTU Chapter",
       period: "Nov 2025 – Present (50% complete)",
-      desc:
-        "Active participant in a structured AI/ML curriculum covering data handling, ML fundamentals, model training, and applied problem-solving in Python.",
+      desc: "Active participant in a structured AI/ML curriculum covering data handling, ML fundamentals, model training, and applied problem-solving in Python.",
     },
   ];
   const achievements = [
@@ -527,7 +516,10 @@ function Experience() {
     },
   ];
   return (
-    <section id="experience" className="relative py-28 md:py-40 px-6 lg:px-10 bg-gradient-to-b from-transparent via-surface/30 to-transparent">
+    <section
+      id="experience"
+      className="relative py-28 md:py-40 px-6 lg:px-10 bg-gradient-to-b from-transparent via-surface/30 to-transparent"
+    >
       <div className="max-w-7xl mx-auto">
         <SectionHeading tag="04 / Experience & Wins" title="Shipped, contracted, and competed." />
 
@@ -579,12 +571,16 @@ function Experience() {
                     <div className="relative">
                       <div
                         className={`inline-flex p-2.5 rounded-xl mb-4 ${
-                          a.featured ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"
+                          a.featured
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-primary/10 text-primary"
                         }`}
                       >
                         <Icon className="h-5 w-5" />
                       </div>
-                      <h3 className="font-display text-lg font-semibold leading-tight">{a.title}</h3>
+                      <h3 className="font-display text-lg font-semibold leading-tight">
+                        {a.title}
+                      </h3>
                       <div className="mt-1 font-mono text-[11px] text-primary uppercase tracking-wider">
                         {a.sub}
                       </div>
@@ -604,7 +600,8 @@ function Experience() {
                     <span className="h-1 w-1 rounded-full bg-primary" /> C++ Programming — SoloLearn
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="h-1 w-1 rounded-full bg-primary" /> Web Development — FreeCodeCamp
+                    <span className="h-1 w-1 rounded-full bg-primary" /> Web Development —
+                    FreeCodeCamp
                   </li>
                 </ul>
               </div>
@@ -636,13 +633,16 @@ function Education() {
                   Addis Ababa Science and Technology University (AASTU) · Expected June 2027
                 </p>
                 <p className="mt-5 text-sm md:text-base text-muted-foreground leading-relaxed max-w-2xl">
-                  Self-taught developer since January 2022 — built C++/Java programs, static web apps, and relational
-                  database systems independently before entering formal ML training.
+                  Self-taught developer since January 2022 — built C++/Java programs, static web
+                  apps, and relational database systems independently before entering formal ML
+                  training.
                 </p>
               </div>
               <div className="flex flex-col items-start md:items-end gap-3">
                 <div className="px-5 py-3 rounded-2xl border border-primary/40 bg-primary/10">
-                  <div className="font-mono text-[10px] uppercase tracking-wider text-primary">CGPA</div>
+                  <div className="font-mono text-[10px] uppercase tracking-wider text-primary">
+                    CGPA
+                  </div>
                   <div className="font-display text-4xl font-bold text-primary">3.56</div>
                 </div>
               </div>
@@ -667,8 +667,8 @@ function Contact() {
             Let's build <span className="italic text-primary">something real.</span>
           </h2>
           <p className="mt-8 max-w-2xl mx-auto text-base md:text-lg text-muted-foreground leading-relaxed">
-            I'm actively looking for internship opportunities in AI/ML or full-stack engineering. If you're hiring or
-            collaborating, my inbox is open.
+            I'm actively looking for internship opportunities in AI/ML or full-stack engineering. If
+            you're hiring or collaborating, my inbox is open.
           </p>
         </Reveal>
         <Reveal delay={0.15}>
@@ -743,7 +743,6 @@ function Footer() {
 
 function Portfolio() {
   return (
-    <ClientOnly>
     <main className="relative bg-background text-foreground">
       <Nav />
       <Hero />
@@ -755,6 +754,5 @@ function Portfolio() {
       <Contact />
       <Footer />
     </main>
-  
-    );
+  );
 }

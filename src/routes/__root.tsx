@@ -73,10 +73,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Dagim Tadesse — Software Engineer & AI/ML Developer" },
-      { name: "description", content: "Portfolio of Dagim Tadesse — Software Engineering student at AASTU building at the intersection of AI, data, and real software." },
+      {
+        name: "description",
+        content:
+          "Portfolio of Dagim Tadesse — Software Engineering student at AASTU building at the intersection of AI, data, and real software.",
+      },
       { name: "author", content: "Dagim Tadesse" },
       { property: "og:title", content: "Dagim Tadesse — Software Engineer & AI/ML Developer" },
-      { property: "og:description", content: "Building at the intersection of AI, data, and real software. Open to internships." },
+      {
+        property: "og:description",
+        content:
+          "Building at the intersection of AI, data, and real software. Open to internships.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

@@ -10,7 +10,7 @@ export const config = {
 export default async function handler(request) {
   const start = Date.now();
   console.log("[API Handler START]", request.method, request.url);
-  
+
   let timeoutId;
   const timeoutPromise = new Promise((_, reject) => {
     timeoutId = setTimeout(() => {
@@ -24,8 +24,10 @@ export default async function handler(request) {
     console.log("[API Handler server.js Loaded]");
 
     const getHeader = (name) => {
-      if (request.headers && typeof request.headers.get === "function") return request.headers.get(name);
-      if (request.headers && (request.headers[name] || request.headers[name.toLowerCase()])) return request.headers[name] || request.headers[name.toLowerCase()];
+      if (request.headers && typeof request.headers.get === "function")
+        return request.headers.get(name);
+      if (request.headers && (request.headers[name] || request.headers[name.toLowerCase()]))
+        return request.headers[name] || request.headers[name.toLowerCase()];
       return undefined;
     };
 
@@ -60,7 +62,7 @@ export default async function handler(request) {
   } catch (error) {
     clearTimeout(timeoutId);
     console.error("[API Handler ERROR]", error.message);
-    
+
     return new Response(
       `<!DOCTYPE html>
 <html>
@@ -79,10 +81,10 @@ export default async function handler(request) {
   <p style="font-size: 12px; color: #999;">Error: ${error.message}</p>
 </body>
 </html>`,
-      { 
-        status: 503, 
-        headers: { "Content-Type": "text/html; charset=utf-8" } 
-      }
+      {
+        status: 503,
+        headers: { "Content-Type": "text/html; charset=utf-8" },
+      },
     );
   }
 }
