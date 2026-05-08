@@ -93,19 +93,140 @@ const SKILLS = [
   { label: "Tools", icon: Wrench, items: ["Git", "GitHub", "Vercel", "VS Code", "Cardano"] },
 ];
 
-const CV_HTML = `<!doctype html><html><head><meta charset="utf-8"/><title>Dagim Tadesse — CV</title></head><body><h1>Dagim Tadesse</h1><p>CV export.</p></body></html>`;
+const CV_HTML = `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Dagim Tadesse - CV</title>
+    <style>
+      :root { color-scheme: light; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        padding: 32px;
+        font-family: Arial, Helvetica, sans-serif;
+        color: #111827;
+        line-height: 1.5;
+        background: #ffffff;
+      }
+      .page { max-width: 860px; margin: 0 auto; }
+      h1 { margin: 0; font-size: 30px; }
+      .subtitle { margin-top: 4px; color: #4b5563; font-size: 14px; }
+      .contact { margin-top: 6px; color: #374151; font-size: 13px; }
+      h2 {
+        margin: 22px 0 8px;
+        font-size: 13px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #0f766e;
+        border-bottom: 1px solid #d1d5db;
+        padding-bottom: 4px;
+      }
+      h3 { margin: 12px 0 4px; font-size: 15px; }
+      .muted { color: #6b7280; font-size: 13px; }
+      p { margin: 8px 0; }
+      ul { margin: 6px 0 0; padding-left: 18px; }
+      li { margin: 3px 0; }
+      .tags { color: #0f766e; font-size: 12px; }
+      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; }
+      .section { break-inside: avoid; }
+      @media print {
+        body { padding: 18px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header>
+        <h1>Dagim Tadesse</h1>
+        <div class="subtitle">Software Engineering Student - AI/ML Developer - Addis Ababa, Ethiopia</div>
+        <div class="contact">dagimtadesse25@gmail.com | github.com/Dagim-Tadesse | linkedin.com/in/dagim-tadesse-ba6b30263</div>
+      </header>
+
+      <section class="section">
+        <h2>Summary</h2>
+        <p>Final-year Software Engineering student at AASTU (CGPA 3.56) building live full-stack, AI/ML, and ERP products. Currently contracted as an Odoo Designer for AI training datasets at ConDigital Inc. Open to internships in AI/ML or full-stack engineering.</p>
+      </section>
+
+      <section class="section">
+        <h2>Experience</h2>
+        <h3>Odoo Designer - AI Training Datasets, ConDigital Inc.</h3>
+        <div class="muted">Contractor - Current - Addis Ababa, Ethiopia</div>
+        <ul>
+          <li>Designing Odoo Website and CRM content and data funnels for AI training datasets.</li>
+          <li>Applying SEO optimization, lead-gen tagging, and data-driven content across client builds.</li>
+        </ul>
+
+        <h3>AI/ML Student - GDG Program, Google Developer Groups AASTU Chapter</h3>
+        <div class="muted">Nov 2025 - Present</div>
+        <ul>
+          <li>Structured AI/ML curriculum covering data handling, ML fundamentals, model training, and applied Python.</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2>Selected Projects</h2>
+        <h3>PriceGuard-AI</h3>
+        <p>AI-powered price recommendation engine that helps users decide whether to buy now or wait. <span class="tags">Python | React | AI/ML | Vercel</span></p>
+
+        <h3>SpendWise</h3>
+        <p>Mobile-first React and TypeScript finance tracker with Supabase auth and live data. <span class="tags">React | TypeScript | Supabase</span></p>
+
+        <h3>Spark Study</h3>
+        <p>Flashcard learning workspace with deck management, live preview, and smooth study flows. <span class="tags">Vite | React | TypeScript</span></p>
+
+        <h3>Cardano Blockchain Hackathon</h3>
+        <p>Smart contract developer on Team CATs Group 2. <span class="tags">Cardano | Blockchain | Smart Contracts</span></p>
+      </section>
+
+      <section class="section">
+        <h2>Skills</h2>
+        <div class="grid">
+          <div><strong>Languages:</strong> Python, Java, C++, TypeScript, JavaScript, PHP</div>
+          <div><strong>Frontend:</strong> React, Vite, HTML/CSS, Responsive Design</div>
+          <div><strong>AI / Data:</strong> Machine Learning, Data Preprocessing, Model Training</div>
+          <div><strong>Backend / DB:</strong> Supabase, MySQL, Microsoft SQL Server, REST APIs</div>
+          <div><strong>ERP / Odoo:</strong> Odoo Website, Odoo CRM, AI Dataset Design</div>
+          <div><strong>Tools:</strong> Git, GitHub, Vercel, VS Code, Cardano</div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Education</h2>
+        <h3>B.Sc. Software Engineering - AASTU</h3>
+        <div class="muted">Expected June 2027 - CGPA 3.56</div>
+      </section>
+
+      <section class="section">
+        <h2>Certifications</h2>
+        <ul>
+          <li>C++ Programming - SoloLearn</li>
+          <li>Web Development - FreeCodeCamp</li>
+        </ul>
+      </section>
+    </div>
+  </body>
+</html>`;
 
 function Nav() {
   const exportCV = () => {
-    const html = CV_HTML;
-    const blob = new Blob([html], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "Dagim-Tadesse-CV.html";
-    a.click();
-    window.open(url, "_blank");
-    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    const printWindow = window.open("", "_blank", "noopener,noreferrer,width=900,height=1200");
+    if (!printWindow) return;
+
+    printWindow.document.open();
+    printWindow.document.write(CV_HTML);
+    printWindow.document.close();
+    printWindow.focus();
+
+    const triggerPrint = () => {
+      printWindow.print();
+    };
+
+    if (printWindow.document.readyState === "complete") {
+      triggerPrint();
+    } else {
+      printWindow.addEventListener("load", triggerPrint, { once: true });
+    }
   };
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {

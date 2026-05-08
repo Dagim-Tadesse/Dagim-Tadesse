@@ -10,8 +10,8 @@
   },
   "routes": [
     {
-      "src": "/((?!api/|assets/|logo.jpg|favicon.ico).*)",
-      "dest": "/api/index.js?pathname=$1"
+      "src": "^/(?!api/|assets/|logo.jpg|favicon.ico)(.*)$",
+      "dest": "/api/index.js?pathname=/$1"
     }
   ]
 }
