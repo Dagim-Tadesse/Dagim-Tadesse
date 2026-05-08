@@ -38,12 +38,18 @@ export default async function handler(request) {
       forwardHeaders = new Headers(request.headers || {});
     }
 
-    // Create a new Request with the absolute URL while preserving method/headers/body
-    const forwardedRequest = new Request(fullUrl, {
+    // Create a new Request with the absolute URL while preserving method/headers/body.
+    // GET and HEAD requests must not include a body.
+    const requestInit = {
       method: request.method || "GET",
       headers: forwardHeaders,
-      body: request.body,
-    });
+    };
+
+    if (requestInit.method !== "GET" && requestInit.method !== "HEAD") {
+      requestInit.body = request.body;
+    }
+
+    const forwardedRequest = new Request(fullUrl, requestInit);
 
     const fetchPromise = Promise.resolve(server.fetch(forwardedRequest, {}, {}));
     const response = await Promise.race([fetchPromise, timeoutPromise]);
@@ -51,6 +57,7 @@ export default async function handler(request) {
     console.log("[API Handler SUCCESS]", response.status);
     return response;
   } catch (error) {
+    clearTimeout(timeoutId);
     console.error("[API Handler ERROR]", error.message);
     
     // Return a basic HTML error response with 503 Service Unavailable
