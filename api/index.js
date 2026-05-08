@@ -1,30 +1,27 @@
+console.log("[API GLOBAL START]", new Date().toISOString());
 import fs from "fs";
 import path from "path";
 
 export const config = {
   runtime: "nodejs",
-  maxDuration: 25,
+  maxDuration: 10, // Cap at 10 for Hobby
 };
 
 export default async function handler(request) {
   const start = Date.now();
-  console.log("[API Handler START]", new Date().toISOString(), request.method, request.url);
+  console.log("[API Handler START]", request.method, request.url);
   
   let timeoutId;
   const timeoutPromise = new Promise((_, reject) => {
     timeoutId = setTimeout(() => {
-      reject(new Error(`SSR rendering timeout after 8 seconds (total elapsed: ${Date.now() - start}ms)`));
-    }, 8000);
+      reject(new Error(`SSR rendering timeout after 9 seconds (elapsed: ${Date.now() - start}ms)`));
+    }, 9000);
   });
 
   try {
-    const reqPath = typeof request.url === "string" ? new URL(request.url, "http://localhost").pathname : "/";
-    console.log("[API Handler Path]", reqPath);
-
-    // Dynamic import to avoid top-level hang and allow logging
-    console.log("[API Handler Importing server.js]");
+    console.log("[API Handler Loading server.js]");
     const { default: server } = await import("../dist/server/server.js");
-    console.log("[API Handler server.js imported]");
+    console.log("[API Handler server.js Loaded]");
 
     const getHeader = (name) => {
       if (request.headers && typeof request.headers.get === "function") return request.headers.get(name);
@@ -69,7 +66,7 @@ export default async function handler(request) {
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Service Temporarily Unavailable</title>
+  <title>Service Error</title>
   <style>
     body { font-family: system-ui; padding: 40px; text-align: center; }
     h1 { color: #d32f2f; }
@@ -77,8 +74,8 @@ export default async function handler(request) {
   </style>
 </head>
 <body>
-  <h1>503 - Service Temporarily Unavailable</h1>
-  <p>The server is experiencing issues. Please try again in a moment.</p>
+  <h1>SSR Error</h1>
+  <p>The server is taking too long to respond.</p>
   <p style="font-size: 12px; color: #999;">Error: ${error.message}</p>
 </body>
 </html>`,

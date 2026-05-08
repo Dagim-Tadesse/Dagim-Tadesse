@@ -20,11 +20,13 @@ import {
   Globe,
   Download,
 } from "lucide-react";
+import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 
 export const Route = createFileRoute("/")({
   component: Portfolio, prerender: true,
-});
+}    </ClientOnly>
+  );
 
 const NAV = [
   { label: "About", href: "#about" },
@@ -154,7 +156,8 @@ function Nav() {
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
+    return (
+    <ClientOnly>) => window.removeEventListener("scroll", onScroll);
   }, []);
   return (
     <header
@@ -739,8 +742,18 @@ function Footer() {
   );
 }
 
+
+function ClientOnly({ children }: { children: React.ReactNode }) {
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+  return mounted ? <>{children}</> : <div className="min-h-screen bg-background flex items-center justify-center font-mono text-xs text-muted-foreground animate-pulse">Loading experience...</div>;
+}
+
 function Portfolio() {
   return (
+    <ClientOnly>
     <main className="relative bg-background text-foreground">
       <Nav />
       <Hero />
@@ -752,5 +765,6 @@ function Portfolio() {
       <Contact />
       <Footer />
     </main>
-  );
+  
+    </ClientOnly>);
 }
