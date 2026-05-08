@@ -9,8 +9,9 @@ export default async function handler(request) {
   console.log("[API Handler START]", new Date().toISOString(), request.method, request.url);
   
   // Create a timeout promise
+  let timeoutId;
   const timeoutPromise = new Promise((_, reject) => {
-    setTimeout(() => {
+    timeoutId = setTimeout(() => {
       reject(new Error("SSR rendering timeout after 20 seconds"));
     }, 20000);
   });
@@ -19,19 +20,34 @@ export default async function handler(request) {
     // Ensure the request URL is absolute. Some platforms (dev servers)
     // provide a path-only URL ("/"), which breaks libraries that call
     // `new URL(request.url)`. Build a full URL using the Host header.
-    const host = request.headers.get("host") || "localhost:3000";
+    const getHeader = (name) => {
+      if (request.headers && typeof request.headers.get === "function") return request.headers.get(name);
+      if (request.headers && (request.headers[name] || request.headers[name.toLowerCase()])) return request.headers[name] || request.headers[name.toLowerCase()];
+      return undefined;
+    };
+
+    const host = getHeader("host") || "localhost:3000";
     const protocol = host.includes("localhost") ? "http" : "https";
     const fullUrl = new URL(request.url, `${protocol}://${host}`).toString();
 
+    // Normalize headers for forwarding (support Headers or plain object)
+    let forwardHeaders;
+    if (request.headers && typeof request.headers.get === "function") {
+      forwardHeaders = request.headers;
+    } else {
+      forwardHeaders = new Headers(request.headers || {});
+    }
+
     // Create a new Request with the absolute URL while preserving method/headers/body
     const forwardedRequest = new Request(fullUrl, {
-      method: request.method,
-      headers: request.headers,
+      method: request.method || "GET",
+      headers: forwardHeaders,
       body: request.body,
     });
 
     const fetchPromise = Promise.resolve(server.fetch(forwardedRequest, {}, {}));
     const response = await Promise.race([fetchPromise, timeoutPromise]);
+    clearTimeout(timeoutId);
     console.log("[API Handler SUCCESS]", response.status);
     return response;
   } catch (error) {
