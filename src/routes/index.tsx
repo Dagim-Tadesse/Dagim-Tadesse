@@ -24,9 +24,8 @@ import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 
 export const Route = createFileRoute("/")({
-  component: Portfolio, prerender: true,
-}    </ClientOnly>
-  );
+  component: Portfolio,
+});
 
 const NAV = [
   { label: "About", href: "#about" },
@@ -157,7 +156,7 @@ function Nav() {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll);
     return (
-    <ClientOnly>) => window.removeEventListener("scroll", onScroll);
+    ) => window.removeEventListener("scroll", onScroll);
   }, []);
   return (
     <header
@@ -742,15 +741,6 @@ function Footer() {
   );
 }
 
-
-function ClientOnly({ children }: { children: React.ReactNode }) {
-  const [mounted, setMounted] = React.useState(false);
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
-  return mounted ? <>{children}</> : <div className="min-h-screen bg-background flex items-center justify-center font-mono text-xs text-muted-foreground animate-pulse">Loading experience...</div>;
-}
-
 function Portfolio() {
   return (
     <ClientOnly>
@@ -766,5 +756,5 @@ function Portfolio() {
       <Footer />
     </main>
   
-    </ClientOnly>);
+    );
 }
