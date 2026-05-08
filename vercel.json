@@ -1,16 +1,17 @@
-﻿{
+{
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm run build",
   "outputDirectory": "dist/client",
   "functions": {
     "api/index.js": {
-      "includeFiles": "dist/**"
+      "includeFiles": "dist/**",
+      "maxDuration": 10
     }
   },
-  "rewrites": [
+  "routes": [
     {
-      "source": "/((?!assets/|logo.jpg|favicon.ico|.*[.].*).*)",
-      "destination": "/api/index.js?pathname=/"
+      "src": "/((?!api/|assets/|logo.jpg|favicon.ico).*)",
+      "dest": "/api/index.js?pathname=$1"
     }
   ]
 }
