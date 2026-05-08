@@ -145,7 +145,7 @@ const CV_HTML = `<!doctype html>
 
       <section class="section">
         <h2>Summary</h2>
-        <p>Final-year Software Engineering student at AASTU (CGPA 3.56) building live full-stack, AI/ML, and ERP products. Currently contracted as an Odoo Designer for AI training datasets at ConDigital Inc. Open to internships in AI/ML or full-stack engineering.</p>
+        <p>Final-year Software Engineering student at AASTU building live full-stack, AI/ML, and ERP products. Currently contracted as an Odoo Designer for AI training datasets at ConDigital Inc. Open to internships in AI/ML or full-stack engineering.</p>
       </section>
 
       <section class="section">
@@ -194,7 +194,7 @@ const CV_HTML = `<!doctype html>
       <section class="section">
         <h2>Education</h2>
         <h3>B.Sc. Software Engineering - AASTU</h3>
-        <div class="muted">Expected June 2027 - CGPA 3.56</div>
+        <div class="muted">Expected June 2027</div>
       </section>
 
       <section class="section">
@@ -396,9 +396,8 @@ function SectionHeading({ tag, title }: { tag: string; title: string }) {
 
 function About() {
   const stats = [
-    { v: "3.56", l: "CGPA" },
     { v: "Final", l: "Year (2 mo to 5th)" },
-    { v: "5+", l: "Live Projects" },
+    { v: "10+", l: "Live Projects" },
     { v: "AI/ML", l: "Focus Track" },
   ];
   return (
@@ -416,10 +415,8 @@ function About() {
                 <span className="text-foreground">
                   Addis Ababa Science and Technology University
                 </span>{" "}
-                (CGPA 3.56), currently working as a contracted{" "}
-                <span className="text-foreground">
-                  Odoo Designer for AI training datasets at ConDigital Inc.
-                </span>
+                and currently working as a contracted{" "}
+                <span className="text-foreground">Odoo Designer for AI training datasets at ConDigital Inc.</span>
               </p>
               <p>
                 I build things that are <span className="text-primary">live and usable</span> —
@@ -762,9 +759,9 @@ function Education() {
               <div className="flex flex-col items-start md:items-end gap-3">
                 <div className="px-5 py-3 rounded-2xl border border-primary/40 bg-primary/10">
                   <div className="font-mono text-[10px] uppercase tracking-wider text-primary">
-                    CGPA
+                    Live Projects
                   </div>
-                  <div className="font-display text-4xl font-bold text-primary">3.56</div>
+                  <div className="font-display text-4xl font-bold text-primary">10+</div>
                 </div>
               </div>
             </div>
@@ -791,9 +788,7 @@ function Contact() {
             I'm actively looking for internship opportunities in AI/ML or full-stack engineering. If
             you're hiring or collaborating, my inbox is open.
           </p>
-        </Reveal>
-        <Reveal delay={0.15}>
-          <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <div className="mt-10">
             <a
               href="mailto:dagimtadesse25@gmail.com"
               className="group inline-flex items-center gap-2 bg-primary text-primary-foreground font-mono text-sm font-semibold px-7 py-4 rounded-full hover:shadow-[0_0_50px_-8px_oklch(0.88_0.18_180/0.7)] transition-all"

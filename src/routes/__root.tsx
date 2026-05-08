@@ -7,6 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 import appCss from "../styles.css?url";
 
@@ -113,6 +114,22 @@ function RootShell({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
+        <div
+          id="boot-screen"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-background"
+        >
+          <div className="flex flex-col items-center gap-4 px-6 text-center">
+            <div className="h-12 w-12 rounded-full border border-primary/30 border-t-primary animate-spin" />
+            <div>
+              <p className="font-display text-xl font-semibold tracking-tight text-foreground">
+                Loading Dagim Tadesse
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Preparing the portfolio experience...
+              </p>
+            </div>
+          </div>
+        </div>
         {children}
         <Scripts />
       </body>
@@ -122,6 +139,31 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    const hideBootScreen = () => {
+      const bootScreen = document.getElementById("boot-screen");
+      if (bootScreen) {
+        bootScreen.style.opacity = "0";
+        bootScreen.style.pointerEvents = "none";
+        bootScreen.style.transition = "opacity 220ms ease";
+        window.setTimeout(() => {
+          bootScreen.remove();
+        }, 220);
+      }
+    };
+
+    if (document.readyState === "complete") {
+      hideBootScreen();
+      return;
+    }
+
+    window.addEventListener("load", hideBootScreen, { once: true });
+
+    return () => {
+      window.removeEventListener("load", hideBootScreen);
+    };
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
