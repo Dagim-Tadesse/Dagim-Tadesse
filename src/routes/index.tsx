@@ -23,7 +23,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 
 export const Route = createFileRoute("/")({
-  component: Portfolio,
+  component: Portfolio, prerender: true,
 });
 
 const NAV = [
@@ -81,9 +81,7 @@ const SKILLS = [
   { label: "Tools", icon: Wrench, items: ["Git", "GitHub", "Vercel", "VS Code", "Cardano"] },
 ];
 
-function Nav() {
-  const exportCV = () => {
-    const html = `<!doctype html><html><head><meta charset="utf-8"/><title>Dagim Tadesse — CV</title>
+const CV_HTML = `<!doctype html><html><head><meta charset="utf-8"/><title>Dagim Tadesse — CV</title>
 <style>
 *{box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;color:#0a0a0f;max-width:780px;margin:32px auto;padding:0 32px;line-height:1.45;font-size:13px}
@@ -139,6 +137,10 @@ a{color:#0a8a8a;text-decoration:none}
 <ul><li>C++ Programming — SoloLearn</li><li>Web Development — FreeCodeCamp</li></ul>
 <script>window.onload=()=>setTimeout(()=>window.print(),300)</script>
 </body></html>`;
+
+function Nav() {
+  const exportCV = () => {
+    const html = CV_HTML;
     const blob = new Blob([html], { type: "text/html" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");

@@ -1,4 +1,3 @@
-import server from "../dist/server/server.js";
 import fs from "fs";
 import path from "path";
 
@@ -8,38 +7,24 @@ export const config = {
 };
 
 export default async function handler(request) {
+  const start = Date.now();
   console.log("[API Handler START]", new Date().toISOString(), request.method, request.url);
   
-  // Create a timeout promise
   let timeoutId;
   const timeoutPromise = new Promise((_, reject) => {
     timeoutId = setTimeout(() => {
-      reject(new Error("SSR rendering timeout after 8 seconds"));
+      reject(new Error(`SSR rendering timeout after 8 seconds (total elapsed: ${Date.now() - start}ms)`));
     }, 8000);
   });
 
   try {
-    // Serve a favicon directly from the repo to avoid routing it through SSR.
-    try {
-      const reqPath = typeof request.url === "string" ? new URL(request.url, "http://localhost").pathname : "/";
-      if (reqPath === "/favicon.ico") {
-        const faviconSource = path.join(process.cwd(), "logo.jpg");
-        if (fs.existsSync(faviconSource)) {
-          const body = fs.readFileSync(faviconSource);
-          // Clear the SSR timeout since we're returning synchronously here.
-          if (typeof timeoutId !== 'undefined') clearTimeout(timeoutId);
-          return new Response(body, {
-            status: 200,
-            headers: {
-              "Content-Type": "image/jpeg",
-              "Cache-Control": "public, max-age=86400"
-            }
-          });
-        }
-      }
-    } catch (e) {
-      console.warn('[API Handler] favicon serve error', e && e.message);
-    }
+    const reqPath = typeof request.url === "string" ? new URL(request.url, "http://localhost").pathname : "/";
+    console.log("[API Handler Path]", reqPath);
+
+    // Dynamic import to avoid top-level hang and allow logging
+    console.log("[API Handler Importing server.js]");
+    const { default: server } = await import("../dist/server/server.js");
+    console.log("[API Handler server.js imported]");
 
     const getHeader = (name) => {
       if (request.headers && typeof request.headers.get === "function") return request.headers.get(name);
@@ -69,10 +54,11 @@ export default async function handler(request) {
 
     const forwardedRequest = new Request(fullUrl, requestInit);
 
+    console.log("[API Handler Calling server.fetch]");
     const fetchPromise = Promise.resolve(server.fetch(forwardedRequest, {}, {}));
     const response = await Promise.race([fetchPromise, timeoutPromise]);
     clearTimeout(timeoutId);
-    console.log("[API Handler SUCCESS]", response.status);
+    console.log("[API Handler SUCCESS]", response.status, `in ${Date.now() - start}ms`);
     return response;
   } catch (error) {
     clearTimeout(timeoutId);
