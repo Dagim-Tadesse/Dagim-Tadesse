@@ -50,7 +50,7 @@ async function buildForVercel() {
   console.log('ℹ Bundling server with esbuild...');
   const { execSync } = await import('child_process');
   try {
-    execSync('npx esbuild dist/server/server.js --bundle --platform=node --format=esm --outfile=dist/server/server.bundle.js --external:fsevents --external:canvas', { stdio: 'inherit' });
+    execSync('npx esbuild dist/server/server.js --bundle --platform=node --format=esm --target=node20 --outfile=dist/server/server.bundle.js --banner:js="import { createRequire } from \'module\'; const require = createRequire(import.meta.url);" --external:fsevents --external:canvas --external:util --external:path --external:fs --external:url --external:http --external:https --external:zlib --external:stream --external:crypto', { stdio: 'inherit' });
     // Replace the original server.js with the bundled one
     fs.renameSync(path.join(rootDir, 'dist', 'server', 'server.bundle.js'), path.join(rootDir, 'dist', 'server', 'server.js'));
     console.log('✓ Server bundled successfully');
