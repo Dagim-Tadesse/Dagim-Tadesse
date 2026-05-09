@@ -104,14 +104,29 @@ const handlerPromise = loadHandler();
 export default async (req, res) => {
   try {
     const h = await handlerPromise;
-    const response = await h.fetch(req);
+    
+    // Construct full URL for the request
+    const protocol = req.headers['x-forwarded-proto'] || 'http';
+    const host = req.headers.host;
+    const url = new URL(req.url, \`\${protocol}://\${host}\`);
+    
+    // Create Fetch Request from Node.js req
+    const fetchRequest = new Request(url.toString(), {
+      method: req.method,
+      headers: req.headers,
+      // Pass the request as body for non-GET methods
+      body: req.method !== 'GET' && req.method !== 'HEAD' ? req : undefined,
+      duplex: 'half'
+    });
+
+    const response = await h.fetch(fetchRequest);
     
     // Convert fetch Response to Node.js response
     for (const [key, value] of response.headers) {
       res.setHeader(key, value);
     }
     res.statusCode = response.status;
-    res.end(await response.text());
+    res.end(Buffer.from(await response.arrayBuffer()));
   } catch (error) {
     console.error('[v0] Request handler error:', error);
     res.statusCode = 500;
