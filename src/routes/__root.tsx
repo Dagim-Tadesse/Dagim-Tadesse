@@ -118,6 +118,8 @@ function RootShell({ children }: { children: React.ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <link rel="icon" href="/logo.jpg" type="image/jpeg" />
+        <link rel="shortcut icon" href="/logo.jpg" type="image/jpeg" />
       </head>
       <body>
         <div
