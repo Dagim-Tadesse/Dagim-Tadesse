@@ -20,7 +20,7 @@ import {
   Globe,
   Download,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 export const Route = createFileRoute("/")({
   component: Portfolio,
@@ -857,18 +857,37 @@ function Footer() {
   );
 }
 
+function ClientOnly({ children }: { children: React.ReactNode }) {
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center font-mono text-xs text-muted-foreground animate-pulse">
+        Loading experience...
+      </div>
+    );
+  }
+
+  return <>{children}</>;
+}
+
 function Portfolio() {
   return (
-    <main className="relative bg-background text-foreground">
-      <Nav />
-      <Hero />
-      <About />
-      <Projects />
-      <Skills />
-      <Experience />
-      <Education />
-      <Contact />
-      <Footer />
-    </main>
+    <ClientOnly>
+      <main className="relative bg-background text-foreground">
+        <Nav />
+        <Hero />
+        <About />
+        <Projects />
+        <Skills />
+        <Experience />
+        <Education />
+        <Contact />
+        <Footer />
+      </main>
+    </ClientOnly>
   );
 }

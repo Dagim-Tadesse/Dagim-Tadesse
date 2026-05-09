@@ -32,7 +32,7 @@ async function copyDirRecursive(src, dest) {
 async function buildForVercel() {
   const outputDir = path.join(rootDir, '.vercel', 'output');
   const staticDir = path.join(outputDir, 'static');
-  const functionsDir = path.join(outputDir, 'functions', 'index');
+  const functionsDir = path.join(outputDir, 'functions', 'index.func');
 
   // Create directories
   await mkdir(staticDir, { recursive: true });
@@ -50,7 +50,7 @@ async function buildForVercel() {
   const functionsServerDir = path.join(functionsDir, 'server');
   if (fs.existsSync(serverDir)) {
     await copyDirRecursive(serverDir, functionsServerDir);
-    console.log('✓ Copied server directory to .vercel/output/functions/index/server');
+    console.log('✓ Copied server directory to .vercel/output/functions/index.func/server');
   }
 
   // DON'T copy node_modules - Vercel installs them automatically
@@ -106,6 +106,8 @@ export default async (req, res) => {
   // Create function config
   const config = {
     runtime: 'nodejs20.x',
+    handler: 'index.js',
+    launcherType: 'Nodejs',
     memory: 1024,
     maxDuration: 60,
   };
@@ -132,26 +134,23 @@ export default async (req, res) => {
     console.log('✓ Copied package.json to functions');
   }
 
-  // Create vercel.json config for routing
+  // Create vercel.json config for routing (Build Output API v3)
   const vercelConfig = {
-    version: 2,
-    builds: [
-      {
-        src: 'package.json',
-        use: '@vercel/node',
-      },
-    ],
+    version: 3,
     routes: [
       {
-        src: '^/api/(.*)',
-        dest: '/api/$1',
+        src: "^/assets/(.*)",
+        headers: { "cache-control": "public, max-age=31536000, immutable" },
+        continue: true
       },
       {
-        src: '^/(.*)',
-        dest: '/index.html',
-        status: 200,
+        handle: "filesystem"
       },
-    ],
+      {
+        src: "/(.*)",
+        dest: "/index"
+      }
+    ]
   };
 
   await writeFile(
