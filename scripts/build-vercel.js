@@ -47,16 +47,22 @@ async function buildForVercel() {
 
   // Bundle the server with esbuild to make it self-contained
   // This avoids the need to copy node_modules and fixes "Server initialization failed" errors
-  console.log('ℹ Bundling server with esbuild...');
-  const { execSync } = await import('child_process');
-  try {
-    execSync('npx esbuild dist/server/server.js --bundle --platform=node --format=esm --target=node20 --outfile=dist/server/server.bundle.js --banner:js="import { createRequire as __createRequire } from \'module\'; var require = __createRequire(import.meta.url);" --external:fsevents --external:canvas --external:util --external:path --external:fs --external:url --external:http --external:https --external:zlib --external:stream --external:crypto', { stdio: 'inherit' });
-    // Replace the original server.js with the bundled one
-    fs.renameSync(path.join(rootDir, 'dist', 'server', 'server.bundle.js'), path.join(rootDir, 'dist', 'server', 'server.js'));
-    console.log('✓ Server bundled successfully');
-  } catch (error) {
-    console.error('✗ Server bundling failed:', error);
-    // Continue anyway, it might work if dependencies are somehow present
+  const serverPath = path.join(rootDir, 'dist', 'server', 'server.js');
+  const serverContent = fs.readFileSync(serverPath, 'utf-8');
+  if (serverContent.includes('__createRequire')) {
+    console.log('ℹ Server already bundled, skipping esbuild step.');
+  } else {
+    console.log('ℹ Bundling server with esbuild...');
+    const { execSync } = await import('child_process');
+    try {
+      execSync('npx esbuild dist/server/server.js --bundle --platform=node --format=esm --target=node20 --outfile=dist/server/server.bundle.js --banner:js="import { createRequire as __createRequire } from \'module\'; var require = __createRequire(import.meta.url);" --external:fsevents --external:canvas --external:util --external:path --external:fs --external:url --external:http --external:https --external:zlib --external:stream --external:crypto', { stdio: 'inherit' });
+      // Replace the original server.js with the bundled one
+      fs.renameSync(path.join(rootDir, 'dist', 'server', 'server.bundle.js'), serverPath);
+      console.log('✓ Server bundled successfully');
+    } catch (error) {
+      console.error('✗ Server bundling failed:', error);
+      // Continue anyway, it might work if dependencies are somehow present
+    }
   }
 
   // Copy entire server directory to functions
