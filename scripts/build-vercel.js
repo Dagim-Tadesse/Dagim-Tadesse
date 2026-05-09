@@ -61,13 +61,16 @@ async function buildForVercel() {
     console.log('✓ Copied node_modules to .vercel/output/functions/index');
   }
 
-  // Create a wrapper index.js that imports and exports the server
+  // Create a wrapper index.js that handles the server correctly
   const indexWrapper = `import serverModule from './server/server.js';
 
-const server = serverModule.default || serverModule;
+const handler = serverModule.default || serverModule;
 
-export default server;
-export const fetch = server.fetch || server;
+if (!handler) {
+  throw new Error('Server module does not export default handler');
+}
+
+export default handler;
 `;
 
   await writeFile(path.join(functionsDir, 'index.js'), indexWrapper);
