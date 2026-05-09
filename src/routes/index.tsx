@@ -210,22 +210,33 @@ const CV_HTML = `<!doctype html>
 
 function Nav() {
   const exportCV = () => {
-    const printWindow = window.open("", "_blank", "noopener,noreferrer,width=900,height=1200");
-    if (!printWindow) return;
+    try {
+      const printWindow = window.open("", "_blank", "noopener,noreferrer,width=900,height=1200");
+      if (!printWindow) {
+        alert("Please allow popups to export your CV.");
+        return;
+      }
 
-    printWindow.document.open();
-    printWindow.document.write(CV_HTML);
-    printWindow.document.close();
-    printWindow.focus();
+      printWindow.document.open();
+      printWindow.document.write(CV_HTML);
+      printWindow.document.close();
+      
+      // Wait for resources to load
+      const triggerPrint = () => {
+        setTimeout(() => {
+          printWindow.focus();
+          printWindow.print();
+        }, 500);
+      };
 
-    const triggerPrint = () => {
-      printWindow.print();
-    };
-
-    if (printWindow.document.readyState === "complete") {
-      triggerPrint();
-    } else {
-      printWindow.addEventListener("load", triggerPrint, { once: true });
+      if (printWindow.document.readyState === "complete") {
+        triggerPrint();
+      } else {
+        printWindow.onload = triggerPrint;
+      }
+    } catch (err) {
+      console.error("Export failed:", err);
+      alert("Failed to open export window. This might be blocked by your browser settings.");
     }
   };
   const [scrolled, setScrolled] = useState(false);
@@ -244,9 +255,20 @@ function Nav() {
       <nav className="max-w-7xl mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
         <a
           href="#top"
-          className="font-display text-xl font-bold tracking-tight inline-flex items-center"
+          className="font-display text-xl font-bold tracking-tight inline-flex items-center gap-2 group"
         >
-          <img src="/logo.jpg" alt="Dagim Tadesse" className="h-8 w-auto rounded-sm" />
+          <div className="h-8 w-8 rounded-sm bg-primary/10 border border-primary/20 flex items-center justify-center overflow-hidden group-hover:border-primary/40 transition-colors">
+            <img 
+              src="/logo.jpg" 
+              alt="" 
+              className="h-full w-full object-cover"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.parentElement!.innerHTML = '<span class="text-primary font-bold text-xs">DT</span>';
+              }}
+            />
+          </div>
+          <span className="hidden sm:inline-block">Dagim Tadesse</span>
         </a>
         <div className="hidden md:flex items-center gap-8 text-sm font-mono text-muted-foreground">
           {NAV.map((n) => (

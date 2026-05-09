@@ -93,7 +93,35 @@ if (!handler) {
 export default handler;
 ```
 
-**Problem**: This wrapper might not be correctly importing the server module because the relative path doesn't account for Vercel's function structure.
+# Deployment Status: STABLE (Build Output API v3)
+
+## Latest Fixes (May 9, 2026)
+
+### 1. Server Bundling with esbuild
+**Problem**: The Vercel function was failing with "Server initialization failed" because it couldn't find its dependencies (`node_modules`) in the standalone function directory.
+**Solution**: Added a bundling step using `esbuild` in `scripts/build-vercel.js`. This bundles all dependencies into a single `server.js` file, making the function self-contained.
+
+### 2. Fetch Request Conversion
+**Problem**: `TypeError: Invalid URL`. The server was receiving a relative path from the Node.js `req` object, but the TanStack Start entry expects a full Fetch `Request` object with protocol and host.
+**Solution**: Updated the serverless wrapper to manually construct a full `URL` (using `x-forwarded-proto` and `host` headers) and wrap the Node.js request into a Fetch `Request` object.
+
+### 3. SSR Protection (504 Timeout Fix)
+**Problem**: Large components causing SSR to exceed the 10-second Vercel Hobby limit.
+**Solution**: Implemented a `ClientOnly` wrapper in `src/routes/index.tsx` that ensures heavy UI components only render in the browser, allowing the server to respond instantly with a lightweight shell.
+
+### 4. Idempotent Build Script
+**Problem**: `postbuild` running multiple times was causing "Identifier already declared" errors.
+**Solution**: Added a check in `scripts/build-vercel.js` to only run the `esbuild` bundling step once.
+
+### 5. UI & Functional Fixes (May 9, 2026 - Final)
+- **Missing Logo**: Identified that `logo.jpg` is missing from the `public` folder. Added an `onError` fallback in `index.tsx` to display initials ("DT") if the image is not found.
+- **Export CV**: Improved the `exportCV` function with better browser compatibility (popup blocker warnings) and a slight delay to ensure the print window is ready before the dialog opens.
+
+## Troubleshooting
+
+- **Server initialization failed**: Check the Vercel logs. The wrapper now provides detailed error messages and stack traces.
+- **Invalid URL**: Ensure the `host` and `x-forwarded-proto` headers are correctly handled in the wrapper.
+- **504 Gateway Timeout**: Ensure `ClientOnly` is used for heavy components and that `maxDuration` is set in `.vc-config.json`.
 
 ## Development Server Status
 
