@@ -53,24 +53,51 @@ async function buildForVercel() {
     console.log('✓ Copied server directory to .vercel/output/functions/index/server');
   }
 
-  // Copy node_modules to functions directory
-  const nodeModulesDir = path.join(rootDir, 'node_modules');
-  const functionsNodeModulesDir = path.join(functionsDir, 'node_modules');
-  if (fs.existsSync(nodeModulesDir)) {
-    await copyDirRecursive(nodeModulesDir, functionsNodeModulesDir);
-    console.log('✓ Copied node_modules to .vercel/output/functions/index');
-  }
+  // DON'T copy node_modules - Vercel installs them automatically
+  // Copying causes deployment to hang due to file count and size
+  console.log('ℹ Skipping node_modules (Vercel installs automatically)');
 
   // Create a wrapper index.js that handles the server correctly
-  const indexWrapper = `import serverModule from './server/server.js';
+  // Use dynamic import with proper error handling for Vercel environment
+  const indexWrapper = `let handler;
 
-const handler = serverModule.default || serverModule;
-
-if (!handler) {
-  throw new Error('Server module does not export default handler');
+async function loadHandler() {
+  try {
+    const serverModule = await import('./server/server.js');
+    handler = serverModule.default || serverModule;
+    
+    if (!handler || !handler.fetch) {
+      throw new Error('Server module missing fetch handler');
+    }
+    
+    console.log('[v0] Server module loaded successfully');
+    return handler;
+  } catch (error) {
+    console.error('[v0] Failed to load server module:', error);
+    throw error;
+  }
 }
 
-export default handler;
+// Preload handler
+const handlerPromise = loadHandler();
+
+export default async (req, res) => {
+  try {
+    const h = await handlerPromise;
+    const response = await h.fetch(req);
+    
+    // Convert fetch Response to Node.js response
+    for (const [key, value] of response.headers) {
+      res.setHeader(key, value);
+    }
+    res.statusCode = response.status;
+    res.end(await response.text());
+  } catch (error) {
+    console.error('[v0] Request handler error:', error);
+    res.statusCode = 500;
+    res.end('Server initialization failed');
+  }
+};
 `;
 
   await writeFile(path.join(functionsDir, 'index.js'), indexWrapper);
