@@ -110,7 +110,7 @@ export default async (req, res) => {
     console.error('[v0] Request handler error:', error);
     res.statusCode = 500;
     res.setHeader('Content-Type', 'text/plain');
-    res.end(`Server initialization failed: ${error.message}\n${error.stack}`);
+    res.end(\`Server initialization failed: \${error.message}\\n\${error.stack}\`);
   }
 };
 `;
