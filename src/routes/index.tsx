@@ -211,32 +211,32 @@ const CV_HTML = `<!doctype html>
 function Nav() {
   const exportCV = () => {
     try {
-      const printWindow = window.open("", "_blank", "noopener,noreferrer,width=900,height=1200");
+      const blob = new Blob([CV_HTML], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      const printWindow = window.open(url, "_blank");
+      
       if (!printWindow) {
         alert("Please allow popups to export your CV.");
         return;
       }
 
-      printWindow.document.open();
-      printWindow.document.write(CV_HTML);
-      printWindow.document.close();
-      
-      // Wait for resources to load
-      const triggerPrint = () => {
+      // Handle printing once the new window is loaded
+      const handlePrint = () => {
         setTimeout(() => {
-          printWindow.focus();
           printWindow.print();
-        }, 500);
+          // We don't revoke immediately to allow the user to print again if needed
+        }, 1000);
       };
 
+      printWindow.onload = handlePrint;
+      
+      // Fallback for browsers where onload might not trigger for Blob URLs
       if (printWindow.document.readyState === "complete") {
-        triggerPrint();
-      } else {
-        printWindow.onload = triggerPrint;
+        handlePrint();
       }
     } catch (err) {
       console.error("Export failed:", err);
-      alert("Failed to open export window. This might be blocked by your browser settings.");
+      alert("Failed to export CV. Please try again.");
     }
   };
   const [scrolled, setScrolled] = useState(false);
@@ -255,20 +255,16 @@ function Nav() {
       <nav className="max-w-7xl mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
         <a
           href="#top"
-          className="font-display text-xl font-bold tracking-tight inline-flex items-center gap-2 group"
+          className="font-display text-xl font-bold tracking-tight inline-flex items-center gap-2.5 group"
         >
-          <div className="h-8 w-8 rounded-sm bg-primary/10 border border-primary/20 flex items-center justify-center overflow-hidden group-hover:border-primary/40 transition-colors">
+          <div className="h-9 w-9 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center overflow-hidden group-hover:border-primary/40 transition-all duration-300">
             <img 
               src="/logo.jpg" 
-              alt="" 
+              alt="Dagim Tadesse Logo" 
               className="h-full w-full object-cover"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-                e.currentTarget.parentElement!.innerHTML = '<span class="text-primary font-bold text-xs">DT</span>';
-              }}
             />
           </div>
-          <span className="hidden sm:inline-block">Dagim Tadesse</span>
+          <span className="hidden sm:inline-block bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">Dagim Tadesse</span>
         </a>
         <div className="hidden md:flex items-center gap-8 text-sm font-mono text-muted-foreground">
           {NAV.map((n) => (
