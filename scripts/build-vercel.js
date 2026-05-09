@@ -45,12 +45,33 @@ async function buildForVercel() {
     console.log('✓ Copied client files to .vercel/output/static');
   }
 
-  // Copy server as serverless function
-  const serverFile = path.join(rootDir, 'dist', 'server', 'server.js');
-  if (fs.existsSync(serverFile)) {
-    await copyFile(serverFile, path.join(functionsDir, 'index.js'));
-    console.log('✓ Copied server to .vercel/output/functions/index');
+  // Copy entire server directory to functions
+  const serverDir = path.join(rootDir, 'dist', 'server');
+  const functionsServerDir = path.join(functionsDir, 'server');
+  if (fs.existsSync(serverDir)) {
+    await copyDirRecursive(serverDir, functionsServerDir);
+    console.log('✓ Copied server directory to .vercel/output/functions/index/server');
   }
+
+  // Copy node_modules to functions directory
+  const nodeModulesDir = path.join(rootDir, 'node_modules');
+  const functionsNodeModulesDir = path.join(functionsDir, 'node_modules');
+  if (fs.existsSync(nodeModulesDir)) {
+    await copyDirRecursive(nodeModulesDir, functionsNodeModulesDir);
+    console.log('✓ Copied node_modules to .vercel/output/functions/index');
+  }
+
+  // Create a wrapper index.js that imports and exports the server
+  const indexWrapper = `import serverModule from './server/server.js';
+
+const server = serverModule.default || serverModule;
+
+export default server;
+export const fetch = server.fetch || server;
+`;
+
+  await writeFile(path.join(functionsDir, 'index.js'), indexWrapper);
+  console.log('✓ Created serverless function index.js');
 
   // Create function config
   const config = {
@@ -64,6 +85,22 @@ async function buildForVercel() {
     JSON.stringify(config, null, 2)
   );
   console.log('✓ Created function configuration');
+
+  // Copy package.json to functions directory
+  const packageJsonPath = path.join(rootDir, 'package.json');
+  const functionsPackageJsonPath = path.join(functionsDir, 'package.json');
+  if (fs.existsSync(packageJsonPath)) {
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+    // Clean up scripts for serverless environment
+    delete packageJson.scripts;
+    delete packageJson.devDependencies;
+    
+    await writeFile(
+      functionsPackageJsonPath,
+      JSON.stringify(packageJson, null, 2)
+    );
+    console.log('✓ Copied package.json to functions');
+  }
 
   // Create vercel.json config for routing
   const vercelConfig = {
