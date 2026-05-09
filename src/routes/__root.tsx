@@ -102,8 +102,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         rel: "icon",
-        href: "/logo.jpg",
+        href: "/logo.jpg?v=2",
         type: "image/jpeg",
+      },
+      {
+        rel: "apple-touch-icon",
+        href: "/logo.jpg?v=2",
       },
     ],
   }),
@@ -118,8 +122,9 @@ function RootShell({ children }: { children: React.ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
-        <link rel="icon" href="/logo.jpg" type="image/jpeg" />
-        <link rel="shortcut icon" href="/logo.jpg" type="image/jpeg" />
+        <link rel="icon" href="/logo.jpg?v=2" type="image/jpeg" />
+        <link rel="shortcut icon" href="/logo.jpg?v=2" type="image/jpeg" />
+        <link rel="apple-touch-icon" href="/logo.jpg?v=2" />
       </head>
       <body>
         <div
