@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import {
-  ArrowUpRight,
+  ArrowUp,
   Github,
   Linkedin,
   Mail,
@@ -12,380 +12,345 @@ import {
   Briefcase,
   Award,
   Sparkles,
-  Code2,
-  Database,
-  Cpu,
-  Wrench,
-  Layers,
+  Star,
+  Users,
+  Bot,
+  Smartphone,
   Globe,
-  Download,
+  Copy,
+  Check,
+  GitCommit,
 } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 export const Route = createFileRoute("/")({
   component: Portfolio,
 });
 
+const TEAL = "#00FFD1";
+
 const NAV = [
-  { label: "About", href: "#about" },
-  { label: "Projects", href: "#projects" },
-  { label: "Skills", href: "#skills" },
-  { label: "Experience", href: "#experience" },
-  { label: "Contact", href: "#contact" },
+  { label: "About", id: "about" },
+  { label: "Projects", id: "projects" },
+  { label: "Skills", id: "skills" },
+  { label: "Experience", id: "experience" },
+  { label: "Contact", id: "contact" },
 ];
 
-const PROJECTS = [
-  {
-    name: "PriceGuard-AI",
-    tagline: "AI-powered price recommendation engine",
-    description:
-      "Built under hackathon pressure and deployed live. Helps buyers, sellers, and admins track product prices over time and delivers an AI-backed recommendation: buy now, or wait. Combines price-history inspection with an ML recommendation layer.",
-    tech: ["Python", "React", "AI/ML", "Vercel"],
-    live: "https://price-guard-ai.vercel.app/",
-    github: "https://github.com/Dagim-Tadesse",
-    hero: true,
-  },
-  {
-    name: "SpendWise",
-    tagline: "Mobile-first personal finance tracker",
-    description:
-      "Fast, mobile-first React & TypeScript finance app powered by Supabase. Log expenses, visualize spending, and track budgets in real time. Real auth, live database — a complete full-stack product.",
-    tech: ["React", "TypeScript", "Supabase", "Mobile-first"],
-    live: "https://spend-wise-bydagim.vercel.app/",
-  },
-  {
-    name: "Spark Study",
-    tagline: "Flashcard learning workspace",
-    description:
-      "A Vite + React + TypeScript flashcard app with full deck management — create decks, edit cards with live preview, flip through study sessions. Clean component architecture and intuitive UX built from scratch.",
-    tech: ["Vite", "React", "TypeScript"],
-    live: "https://spark-study-vert.vercel.app/",
-  },
-  {
-    name: "Cardano Blockchain Hackathon",
-    badge: "Hackathon",
-    tagline: "Smart contract developer — Team CATs Group 2",
-    description:
-      "Participated as a blockchain developer in a Cardano-focused hackathon. Worked with smart contracts and blockchain application logic under real-world team constraints and deadlines.",
-    tech: ["Cardano", "Blockchain", "Smart Contracts"],
-    github: "https://github.com/Dagim-Tadesse/CATs-Group-2",
-  },
+type Project = {
+  name: string;
+  badges: string[];
+  type?: string;
+  tagline: string;
+  description: string;
+  stack: string[];
+  live?: string;
+  github?: string;
+  hero?: boolean;
+  trophy?: boolean;
+};
+
+const TABS = [
+  { id: "top", label: "Top", icon: Star },
+  { id: "ai", label: "AI / ML", icon: Bot },
+  { id: "group", label: "Group", icon: Users },
+  { id: "mobile", label: "Mobile", icon: Smartphone },
+  { id: "web", label: "Web / Full-Stack", icon: Globe },
+] as const;
+type TabId = (typeof TABS)[number]["id"];
+
+const PROJECTS: Record<TabId, Project[]> = {
+  top: [
+    {
+      name: "PriceGuard-AI",
+      badges: ["🏆 2nd Place — GDG AASTU Hackathon"],
+      type: "Group · AI/ML Hackathon",
+      tagline: "AI-powered price recommendation engine",
+      description:
+        "Built under hackathon pressure with a team and deployed live. Tracks product prices over time and delivers a clear AI-backed recommendation — buy now or wait. Combines price-history inspection with an ML recommendation layer. 2nd place in the AI/ML track.",
+      stack: ["TypeScript", "React", "AI/ML", "Vercel"],
+      live: "https://price-guard-ai.vercel.app/",
+      github: "https://github.com/Dagim-Tadesse/PriceGuard-AI",
+      hero: true,
+      trophy: true,
+    },
+    {
+      name: "SpendWise",
+      badges: ["Live · In Personal Use"],
+      type: "Solo · Full-Stack",
+      tagline: "Mobile-first personal finance tracker",
+      description:
+        "A fast, mobile-first finance app built with React, TypeScript and Supabase. Real authentication, live database, budget tracking and spending visualisation. A complete production product I actively use — not a demo.",
+      stack: ["React", "TypeScript", "Supabase", "Vercel"],
+      live: "https://spend-wise-bydagim.vercel.app/",
+    },
+    {
+      name: "Savory Serve",
+      badges: ["Web App"],
+      type: "Solo · Full-Stack",
+      tagline: "Restaurant & café ordering platform",
+      description:
+        "A full restaurant and café web experience — browse menus, place orders and manage the flow from table to kitchen. Showcases real-world UI complexity and state management for a hospitality use case.",
+      stack: ["TypeScript", "React", "Vercel"],
+    },
+    {
+      name: "Gebeya Now",
+      badges: ["Mobile · Original Design"],
+      type: "Solo · Mobile",
+      tagline: "Mobile marketplace app — built from scratch",
+      description:
+        "A Flutter mobile marketplace I designed entirely from scratch. Gebeya (\"market\" in Amharic) lets users browse, list and interact with products in a clean native experience. A personal design challenge that became a full product.",
+      stack: ["Flutter", "Dart", "Mobile"],
+      github: "https://github.com/Dagim-Tadesse/gebeya_now",
+    },
+  ],
+  ai: [
+    {
+      name: "PriceGuard-AI",
+      badges: ["🏆 2nd Place", "Group"],
+      tagline: "AI price recommendation engine",
+      description:
+        "Built for the GDG AASTU Hackathon. ML-powered recommendation layer that analyses price histories and advises buyers: buy now, or wait. Live deployment with real data.",
+      stack: ["TypeScript", "React", "AI/ML", "Python"],
+      live: "https://price-guard-ai.vercel.app/",
+      github: "https://github.com/Dagim-Tadesse/PriceGuard-AI",
+      trophy: true,
+    },
+    {
+      name: "Ride Price Estimation System",
+      badges: ["AI/ML · Data Science"],
+      tagline: "ML model for ride fare prediction",
+      description:
+        "A Jupyter notebook ML project estimating ride prices from route, time and demand features. Covers preprocessing, feature engineering and regression model training — applied ML fundamentals end-to-end.",
+      stack: ["Python", "Jupyter", "scikit-learn"],
+      github: "https://github.com/Dagim-Tadesse/Ride_Price_Estimation_System",
+    },
+    {
+      name: "Face Auth System",
+      badges: ["AI · Group · Python"],
+      tagline: "Facial recognition authentication system",
+      description:
+        "Python-based face authentication system built as a group project. Uses computer vision to detect and verify identity — applied AI working directly with image processing and model inference.",
+      stack: ["Python", "OpenCV", "Computer Vision"],
+      github: "https://github.com/Dagim-Tadesse/face-auth-system",
+    },
+    {
+      name: "GDSC ML Study Sessions",
+      badges: ["Learning · Active"],
+      tagline: "GDG AI/ML structured curriculum (50% complete)",
+      description:
+        "Active participant in Google Developer Groups' structured ML curriculum. Hands-on notebooks covering data handling, ML fundamentals, model training and Python-based applied problem-solving.",
+      stack: ["Python", "Jupyter", "scikit-learn"],
+      github: "https://github.com/Dagim-Tadesse/GDSC_study_session_ML_g1",
+    },
+  ],
+  group: [
+    {
+      name: "PriceGuard-AI",
+      badges: ["🏆 2nd Place — GDG Hackathon"],
+      tagline: "AI price recommendation — hackathon team project",
+      description:
+        "The project that won 2nd place at the GDG AASTU AI/ML Hackathon. Built as a team under competition pressure with a live deployment.",
+      stack: ["TypeScript", "React", "AI/ML"],
+      live: "https://price-guard-ai.vercel.app/",
+      trophy: true,
+    },
+    {
+      name: "CATs Group 2 — Cardano Hackathon",
+      badges: ["Blockchain · Hackathon"],
+      tagline: "Smart contract development on Cardano",
+      description:
+        "Participated as a blockchain developer in a Cardano-focused hackathon. Worked on smart contract concepts and blockchain application logic under real-world constraints — an early signal of picking up unfamiliar stacks fast.",
+      stack: ["JavaScript", "Cardano", "Smart Contracts"],
+      github: "https://github.com/Dagim-Tadesse/CATs-Group-2",
+    },
+    {
+      name: "Face Auth System",
+      badges: ["Group · AI"],
+      tagline: "Team-built facial recognition system",
+      description:
+        "Facial recognition authentication system built collaboratively in Python. Demonstrates team coordination on a computer vision problem.",
+      stack: ["Python", "OpenCV"],
+      github: "https://github.com/Dagim-Tadesse/face-auth-system",
+    },
+    {
+      name: "Water Monitoring System",
+      badges: ["Academic · AASTU IETP"],
+      tagline: "IoT water monitoring — 4th-year university project",
+      description:
+        "A TypeScript-based water monitoring system built for AASTU's 4th-year Integrated Engineering Team Project. Real-world utility in a developing-country context.",
+      stack: ["TypeScript", "IoT"],
+      github: "https://github.com/Dagim-Tadesse/Water_Monitoring_System",
+    },
+  ],
+  mobile: [
+    {
+      name: "Gebeya Now",
+      badges: ["⭐ Original Design · Solo"],
+      tagline: "Mobile marketplace — built from scratch",
+      description:
+        "A Flutter mobile marketplace I designed from scratch. Browse, list and interact with products in a clean native UI. A personal design challenge turned full product — UI design plus Dart/Flutter development.",
+      stack: ["Flutter", "Dart"],
+      github: "https://github.com/Dagim-Tadesse/gebeya_now",
+    },
+    {
+      name: "Flutter Mobile Programming Course",
+      badges: ["Academic · Coursework"],
+      tagline: "Mobile programming coursework",
+      description:
+        "Repository of Flutter projects built during the university Mobile Programming course (2025–2026). Growing proficiency in Flutter widget architecture, navigation and state management.",
+      stack: ["Flutter", "Dart"],
+      github: "https://github.com/Dagim-Tadesse/Flutter-mobile-programming-course-25-26",
+    },
+    {
+      name: "Flutter Training",
+      badges: ["Learning · Practice"],
+      tagline: "Flutter fundamentals and practice builds",
+      description:
+        "Hands-on Flutter training repository covering layouts, widgets, gestures, state and routing — used to build a solid mobile foundation before shipping production apps.",
+      stack: ["Flutter", "Dart", "C++"],
+      github: "https://github.com/Dagim-Tadesse/flutter-training",
+    },
+  ],
+  web: [
+    {
+      name: "SpendWise",
+      badges: ["Live · Full-Stack"],
+      tagline: "Mobile-first personal finance tracker",
+      description:
+        "React + TypeScript + Supabase finance app. Real auth, live database, production deployment — and I use it daily.",
+      stack: ["React", "TypeScript", "Supabase"],
+      live: "https://spend-wise-bydagim.vercel.app/",
+    },
+    {
+      name: "Savory Serve",
+      badges: ["Web App"],
+      tagline: "Restaurant & café ordering platform",
+      description:
+        "Full restaurant ordering web app — menu browsing, order placement and a kitchen management flow.",
+      stack: ["TypeScript", "React"],
+    },
+    {
+      name: "Spark Study",
+      badges: ["Live · Open Source · 8 forks"],
+      tagline: "Flashcard learning workspace",
+      description:
+        "Vite + React + TypeScript flashcard app with deck management, a card editor with live preview and a study/flip session flow. 8 forks on GitHub shows real adoption.",
+      stack: ["Vite", "React", "TypeScript"],
+      live: "https://spark-study-vert.vercel.app/",
+      github: "https://github.com/Dagim-Tadesse/spark-study",
+    },
+    {
+      name: "Hotel Booking System",
+      badges: ["Full-Stack · Java"],
+      tagline: "Hotel reservation and management system",
+      description:
+        "Java-based hotel booking system with reservation management, room tracking and booking logic. One of my earliest full-stack projects — backend fundamentals, database design and CRUD.",
+      stack: ["Java", "MySQL"],
+      github: "https://github.com/Dagim-Tadesse/hotel-booking-system",
+    },
+  ],
+};
+
+const SKILLS: { group: string; items: string[] }[] = [
+  { group: "Languages", items: ["Python", "Java", "TypeScript", "JavaScript", "C++", "Dart", "PHP"] },
+  { group: "Frontend", items: ["React", "Vite", "HTML/CSS", "Tailwind", "Responsive Design"] },
+  { group: "Mobile", items: ["Flutter", "Dart", "Mobile UI Design"] },
+  { group: "AI / Data", items: ["Machine Learning", "Data Preprocessing", "Model Training", "Computer Vision", "Jupyter"] },
+  { group: "Backend / DB", items: ["Supabase", "MySQL", "MS SQL Server", "REST APIs"] },
+  { group: "ERP / Odoo", items: ["Odoo Website", "Odoo CRM", "AI Dataset Design", "Lead Generation"] },
+  { group: "Tools", items: ["Git", "GitHub", "Vercel", "VS Code", "Figma"] },
 ];
 
-const SKILLS = [
-  {
-    label: "Languages",
-    icon: Code2,
-    items: ["Python", "Java", "C++", "TypeScript", "JavaScript", "PHP"],
-  },
-  { label: "Frontend", icon: Layers, items: ["React", "Vite", "HTML/CSS", "Responsive Design"] },
-  {
-    label: "AI / Data",
-    icon: Cpu,
-    items: ["Machine Learning", "Data Preprocessing", "Model Training", "Python (AI/ML)"],
-  },
-  {
-    label: "Backend / DB",
-    icon: Database,
-    items: ["Supabase", "MySQL", "Microsoft SQL Server", "REST APIs"],
-  },
-  { label: "ERP / Odoo", icon: Globe, items: ["Odoo Website", "Odoo CRM", "AI Dataset Design"] },
-  { label: "Tools", icon: Wrench, items: ["Git", "GitHub", "Vercel", "VS Code", "Cardano"] },
+const TYPING_PHRASES = [
+  "Building at the intersection of AI, data, and real software.",
+  "Software Engineering Student. AI/ML enthusiast. Odoo Specialist.",
+  "Open to internships.",
 ];
 
-const CV_HTML = `<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Dagim Tadesse - CV</title>
-    <style>
-      :root { color-scheme: light; }
-      * { box-sizing: border-box; }
-      body {
-        margin: 0;
-        padding: 32px;
-        font-family: Arial, Helvetica, sans-serif;
-        color: #111827;
-        line-height: 1.5;
-        background: #ffffff;
-      }
-      .page { max-width: 860px; margin: 0 auto; }
-      h1 { margin: 0; font-size: 30px; }
-      .subtitle { margin-top: 4px; color: #4b5563; font-size: 14px; }
-      .contact { margin-top: 6px; color: #374151; font-size: 13px; }
-      h2 {
-        margin: 22px 0 8px;
-        font-size: 13px;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: #0f766e;
-        border-bottom: 1px solid #d1d5db;
-        padding-bottom: 4px;
-      }
-      h3 { margin: 12px 0 4px; font-size: 15px; }
-      .muted { color: #6b7280; font-size: 13px; }
-      p { margin: 8px 0; }
-      ul { margin: 6px 0 0; padding-left: 18px; }
-      li { margin: 3px 0; }
-      .tags { color: #0f766e; font-size: 12px; }
-      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; }
-      .section { break-inside: avoid; }
-      @media print {
-        body { padding: 18px; }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="page">
-      <header>
-        <h1>Dagim Tadesse</h1>
-        <div class="subtitle">Software Engineering Student - AI/ML Developer - Addis Ababa, Ethiopia</div>
-        <div class="contact">dagimtadesse25@gmail.com | github.com/Dagim-Tadesse | linkedin.com/in/dagim-tadesse-ba6b30263</div>
-      </header>
-
-      <section class="section">
-        <h2>Summary</h2>
-        <p>Final-year Software Engineering student at AASTU building live full-stack, AI/ML, and ERP products. Currently contracted as an Odoo Designer for AI training datasets at ConDigital Inc. Open to internships in AI/ML or full-stack engineering.</p>
-      </section>
-
-      <section class="section">
-        <h2>Experience</h2>
-        <h3>Odoo Designer - AI Training Datasets, ConDigital Inc.</h3>
-        <div class="muted">Contractor - Current - Addis Ababa, Ethiopia</div>
-        <ul>
-          <li>Designing Odoo Website and CRM content and data funnels for AI training datasets.</li>
-          <li>Applying SEO optimization, lead-gen tagging, and data-driven content across client builds.</li>
-        </ul>
-
-        <h3>AI/ML Student - GDG Program, Google Developer Groups AASTU Chapter</h3>
-        <div class="muted">Nov 2025 - Present</div>
-        <ul>
-          <li>Structured AI/ML curriculum covering data handling, ML fundamentals, model training, and applied Python.</li>
-        </ul>
-      </section>
-
-      <section class="section">
-        <h2>Selected Projects</h2>
-        <h3>PriceGuard-AI</h3>
-        <p>AI-powered price recommendation engine that helps users decide whether to buy now or wait. <span class="tags">Python | React | AI/ML | Vercel</span></p>
-
-        <h3>SpendWise</h3>
-        <p>Mobile-first React and TypeScript finance tracker with Supabase auth and live data. <span class="tags">React | TypeScript | Supabase</span></p>
-
-        <h3>Spark Study</h3>
-        <p>Flashcard learning workspace with deck management, live preview, and smooth study flows. <span class="tags">Vite | React | TypeScript</span></p>
-
-        <h3>Cardano Blockchain Hackathon</h3>
-        <p>Smart contract developer on Team CATs Group 2. <span class="tags">Cardano | Blockchain | Smart Contracts</span></p>
-      </section>
-
-      <section class="section">
-        <h2>Skills</h2>
-        <div class="grid">
-          <div><strong>Languages:</strong> Python, Java, C++, TypeScript, JavaScript, PHP</div>
-          <div><strong>Frontend:</strong> React, Vite, HTML/CSS, Responsive Design</div>
-          <div><strong>AI / Data:</strong> Machine Learning, Data Preprocessing, Model Training</div>
-          <div><strong>Backend / DB:</strong> Supabase, MySQL, Microsoft SQL Server, REST APIs</div>
-          <div><strong>ERP / Odoo:</strong> Odoo Website, Odoo CRM, AI Dataset Design</div>
-          <div><strong>Tools:</strong> Git, GitHub, Vercel, VS Code, Cardano</div>
-        </div>
-      </section>
-
-      <section class="section">
-        <h2>Education</h2>
-        <h3>B.Sc. Software Engineering - AASTU</h3>
-        <div class="muted">Expected June 2027</div>
-      </section>
-
-      <section class="section">
-        <h2>Certifications</h2>
-        <ul>
-          <li>C++ Programming - SoloLearn</li>
-          <li>Web Development - FreeCodeCamp</li>
-        </ul>
-      </section>
-    </div>
-  </body>
-</html>`;
-
-function Nav() {
-  const exportCV = () => {
-    try {
-      const blob = new Blob([CV_HTML], { type: "text/html" });
-      const url = URL.createObjectURL(blob);
-      const printWindow = window.open(url, "_blank");
-      
-      if (!printWindow) {
-        alert("Please allow popups to export your CV.");
-        return;
-      }
-
-      // Handle printing once the new window is loaded
-      const handlePrint = () => {
-        setTimeout(() => {
-          printWindow.print();
-          // We don't revoke immediately to allow the user to print again if needed
-        }, 1000);
-      };
-
-      printWindow.onload = handlePrint;
-      
-      // Fallback for browsers where onload might not trigger for Blob URLs
-      if (printWindow.document.readyState === "complete") {
-        handlePrint();
-      }
-    } catch (err) {
-      console.error("Export failed:", err);
-      alert("Failed to export CV. Please try again.");
-    }
-  };
-  const [scrolled, setScrolled] = useState(false);
+function useTyping(phrases: string[], typeMs = 38, holdMs = 1600) {
+  const [text, setText] = useState("");
+  const [i, setI] = useState(0);
+  const [del, setDel] = useState(false);
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-  return (
-    <header
-      className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 delay-100 ${
-        scrolled ? "backdrop-blur-xl bg-background/40 border-b border-border/30" : ""
-      }`}
-      style={{ WebkitBackdropFilter: scrolled ? "blur(10px)" : undefined }}
-    >
-      <nav className="max-w-7xl mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
-        <a
-          href="#top"
-          className="font-display text-xl font-bold tracking-tight inline-flex items-center gap-2.5 group"
-        >
-          <div className="h-9 w-9 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center overflow-hidden group-hover:border-primary/40 transition-all duration-300">
-            <img 
-              src="/logo.jpg" 
-              alt="Dagim Tadesse Logo" 
-              className="h-full w-full object-cover"
-            />
-          </div>
-          <span className="hidden sm:inline-block bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">Dagim Tadesse</span>
-        </a>
-        <div className="hidden md:flex items-center gap-8 text-sm font-mono text-muted-foreground">
-          {NAV.map((n) => (
-            <a key={n.href} href={n.href} className="hover:text-foreground transition-colors">
-              {n.label}
-            </a>
-          ))}
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={exportCV}
-            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/40 bg-primary/10 hover:bg-primary/20 text-xs font-mono text-primary transition"
-            aria-label="Export CV as PDF"
-          >
-            <Download className="h-3 w-3" />
-            Export CV
-          </button>
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5 text-xs font-mono">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inset-0 rounded-full bg-primary animate-ping opacity-75" />
-              <span className="relative rounded-full h-2 w-2 bg-primary" />
-            </span>
-            <span className="hidden sm:inline text-foreground/90">Open to Internships</span>
-            <span className="sm:hidden text-foreground/90">Open</span>
-          </div>
-        </div>
-      </nav>
-    </header>
-  );
+    const reduced = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) { setText(phrases[0]); return; }
+    const phrase = phrases[i % phrases.length];
+    if (!del && text === phrase) { const t = setTimeout(() => setDel(true), holdMs); return () => clearTimeout(t); }
+    if (del && text === "") { setDel(false); setI((v) => v + 1); return; }
+    const t = setTimeout(() => {
+      setText(del ? phrase.slice(0, text.length - 1) : phrase.slice(0, text.length + 1));
+    }, del ? typeMs / 1.6 : typeMs);
+    return () => clearTimeout(t);
+  }, [text, del, i, phrases, typeMs, holdMs]);
+  return text;
 }
 
-function Hero() {
+function useScrollSpy(ids: string[]) {
+  const [active, setActive] = useState(ids[0]);
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (visible[0]) setActive(visible[0].target.id);
+      },
+      { rootMargin: "-30% 0px -55% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] },
+    );
+    ids.forEach((id) => { const el = document.getElementById(id); if (el) obs.observe(el); });
+    return () => obs.disconnect();
+  }, [ids]);
+  return active;
+}
+
+function CursorSpotlight() {
   const ref = useRef<HTMLDivElement>(null);
-
-  return (
-    <section
-      id="top"
-      ref={ref}
-      className="relative min-h-screen flex items-center overflow-hidden noise"
-    >
-      <div className="absolute inset-0 grid-bg [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" />
-      <div className="absolute inset-0 radial-glow" />
-      <motion.div className="relative max-w-7xl mx-auto px-6 lg:px-10 w-full pt-24">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="flex items-center gap-3 font-mono text-xs text-muted-foreground mb-8"
-        >
-          <span className="h-px w-10 bg-primary" />
-          <MapPin className="h-3 w-3" />
-          Addis Ababa, Ethiopia · ET
-        </motion.div>
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.1 }}
-          className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[0.95] text-balance max-w-5xl"
-        >
-          Building at the intersection of <span className="italic text-primary">AI, data,</span> and
-          real software.
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="mt-8 max-w-2xl font-mono text-sm md:text-base text-muted-foreground leading-relaxed"
-        >
-          Software Engineering student at AASTU · ML/AI enthusiast · Odoo ERP specialist · Open to
-          internships
-        </motion.p>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.45 }}
-          className="mt-10 flex flex-wrap gap-3"
-        >
-          <a
-            href="#projects"
-            className="group inline-flex items-center gap-2 bg-primary text-primary-foreground font-mono text-sm font-semibold px-6 py-3.5 rounded-full hover:shadow-[0_0_40px_-8px_oklch(0.88_0.18_180/0.6)] transition-all"
-          >
-            View Projects
-            <ArrowUpRight className="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-          </a>
-          <a
-            href="https://github.com/Dagim-Tadesse"
-            target="_blank"
-            rel="noreferrer"
-            className="group inline-flex items-center gap-2 border border-border hover:border-primary/50 font-mono text-sm font-semibold px-6 py-3.5 rounded-full transition-all hover:bg-surface"
-          >
-            <Github className="h-4 w-4" />
-            GitHub Profile
-          </a>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.8 }}
-          className="absolute bottom-10 right-6 lg:right-10 hidden md:flex flex-col items-end gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground"
-        >
-          <span>scroll</span>
-          <span className="h-12 w-px bg-gradient-to-b from-primary to-transparent" />
-        </motion.div>
-      </motion.div>
-    </section>
-  );
+  useEffect(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) return;
+    const onMove = (e: MouseEvent) => {
+      if (!ref.current) return;
+      ref.current.style.background = `radial-gradient(600px circle at ${e.clientX}px ${e.clientY}px, rgba(0,255,209,0.07), transparent 60%)`;
+    };
+    window.addEventListener("mousemove", onMove);
+    return () => window.removeEventListener("mousemove", onMove);
+  }, []);
+  return <div ref={ref} aria-hidden className="pointer-events-none fixed inset-0 z-30" />;
 }
 
-function Reveal({
-  children,
-  delay = 0,
-  className = "",
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  className?: string;
-}) {
+function Counter({ to, suffix = "", prefix = "", decimals = 0 }: { to: number; suffix?: string; prefix?: string; decimals?: number }) {
+  const [val, setVal] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const started = useRef(false);
+  useEffect(() => {
+    if (!ref.current) return;
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting && !started.current) {
+          started.current = true;
+          const start = performance.now();
+          const dur = 1400;
+          const tick = (t: number) => {
+            const p = Math.min(1, (t - start) / dur);
+            const eased = 1 - Math.pow(1 - p, 3);
+            setVal(to * eased);
+            if (p < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        }
+      });
+    }, { threshold: 0.3 });
+    obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, [to]);
+  return <span ref={ref}>{prefix}{val.toFixed(decimals)}{suffix}</span>;
+}
+
+function Reveal({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.6, delay, ease: [0.21, 0.47, 0.32, 0.98] }}
@@ -396,516 +361,502 @@ function Reveal({
   );
 }
 
-function SectionHeading({ tag, title }: { tag: string; title: string }) {
+function Portfolio() {
+  const typed = useTyping(TYPING_PHRASES);
+  const active = useScrollSpy(NAV.map((n) => n.id));
+  const [showTop, setShowTop] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [tab, setTab] = useState<TabId>("top");
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.2 });
+
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > 600);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const copyEmail = async () => {
+    try { await navigator.clipboard.writeText("dagimtadesse25@gmail.com"); setCopied(true); setTimeout(() => setCopied(false), 1800); } catch {}
+  };
+
+  const scrollTo = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  return (
+    <div className="relative min-h-screen bg-background text-foreground font-mono selection:bg-[color:var(--color-teal)]/30">
+      <CursorSpotlight />
+      <motion.div style={{ scaleX: progress }} className="fixed left-0 right-0 top-0 z-50 h-[2px] origin-left" aria-hidden>
+        <div className="h-full w-full" style={{ background: TEAL }} />
+      </motion.div>
+
+      {/* NAV */}
+      <header className="fixed inset-x-0 top-0 z-40 backdrop-blur-md bg-background/70 border-b border-border">
+        <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
+          <button onClick={() => scrollTo("home")} className="font-display text-lg font-bold tracking-tight">
+            DT<span style={{ color: TEAL }}>.</span>
+          </button>
+          <ul className="hidden items-center gap-1 md:flex">
+            {NAV.map((n) => (
+              <li key={n.id}>
+                <button
+                  onClick={() => scrollTo(n.id)}
+                  className={`relative px-3 py-1.5 text-xs uppercase tracking-widest transition-colors ${active === n.id ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                >
+                  {n.label}
+                  {active === n.id && (
+                    <motion.span layoutId="navdot" className="absolute -bottom-0.5 left-1/2 h-[2px] w-6 -translate-x-1/2" style={{ background: TEAL }} />
+                  )}
+                </button>
+              </li>
+            ))}
+          </ul>
+          <div className="flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1.5">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-70" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+            </span>
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-foreground/90">Open to Internships</span>
+          </div>
+        </nav>
+      </header>
+
+      {/* HERO */}
+      <section id="home" className="relative flex min-h-screen items-center overflow-hidden pt-24">
+        <div className="absolute inset-0 grid-bg opacity-40" aria-hidden />
+        <div className="absolute inset-0 radial-glow" aria-hidden />
+        <div className="absolute -left-32 top-1/3 h-96 w-96 rounded-full blur-[120px]" style={{ background: "rgba(0,255,209,0.08)" }} aria-hidden />
+        <div className="relative mx-auto w-full max-w-6xl px-5">
+          <Reveal>
+            <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/40 px-3 py-1 text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+              <MapPin size={12} style={{ color: TEAL }} /> Addis Ababa, Ethiopia
+            </p>
+          </Reveal>
+          <h1 className="font-display text-balance text-5xl font-bold leading-[1.05] tracking-tight md:text-7xl lg:text-8xl">
+            Dagim<br />
+            Tadesse<span style={{ color: TEAL }}>.</span>
+          </h1>
+          <div className="mt-8 max-w-3xl text-lg text-muted-foreground md:text-xl min-h-[3.5rem]">
+            <span className="text-foreground">{typed}</span>
+            <span className="ml-1 inline-block h-5 w-[2px] animate-pulse align-middle" style={{ background: TEAL }} />
+          </div>
+          <p className="mt-4 max-w-2xl text-sm text-muted-foreground">
+            Software Engineering student at AASTU · ML/AI enthusiast · Odoo ERP specialist
+          </p>
+          <div className="mt-10 flex flex-wrap items-center gap-3">
+            <button
+              onClick={() => scrollTo("projects")}
+              className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-primary-foreground transition-transform hover:-translate-y-0.5"
+              style={{ background: TEAL, boxShadow: "0 10px 40px -10px rgba(0,255,209,0.5)" }}
+            >
+              View Projects
+              <ExternalLink size={14} className="transition-transform group-hover:translate-x-0.5" />
+            </button>
+            <a
+              href="https://github.com/Dagim-Tadesse"
+              target="_blank" rel="noreferrer noopener"
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-card/40 px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:border-[color:var(--color-teal)]/60"
+            >
+              <Github size={16} /> GitHub →
+            </a>
+          </div>
+          <div className="mt-12">
+            <GitHubStrip />
+          </div>
+        </div>
+      </section>
+
+      {/* ABOUT */}
+      <section id="about" className="relative scroll-mt-20 py-28">
+        <div className="mx-auto max-w-6xl px-5">
+          <SectionHeading kicker="01" title="About" />
+          <div className="mt-12 grid gap-12 md:grid-cols-2 md:gap-16">
+            <Reveal>
+              <p className="text-lg leading-relaxed text-muted-foreground">
+                I'm a final-year Software Engineering student at <span className="text-foreground">AASTU (CGPA 3.56)</span>, currently working as a contracted Odoo Designer for AI training datasets at <span className="text-foreground">ConDigital Inc.</span> I build things that are live and usable — finance trackers, AI price tools, flashcard apps, and mobile experiences.
+                <br /><br />
+                I placed <span className="text-foreground">2nd in the GDG AASTU AI/ML Hackathon</span> with PriceGuard-AI and I'm actively training in the GDG ML curriculum. Driven by curiosity, disciplined by habit, looking for an internship where I can work on real problems in AI, data, or full-stack engineering.
+              </p>
+              <p className="mt-6 inline-flex items-center gap-2 rounded-md border border-[color:var(--color-teal)]/30 bg-[color:var(--color-teal)]/5 px-3 py-2 text-xs uppercase tracking-widest" style={{ color: TEAL }}>
+                <Sparkles size={14} /> Currently open to internships in AI/ML or Full-Stack
+              </p>
+            </Reveal>
+            <Reveal delay={0.1}>
+              <div className="grid grid-cols-2 gap-4">
+                <StatCard label="CGPA" value={<Counter to={3.56} decimals={2} />} />
+                <StatCard label="Graduation" value="2027" />
+                <StatCard label="Public Repos" value={<><Counter to={6} />+</>} />
+                <StatCard label="Hackathon" value={<span className="inline-flex items-center gap-1.5"><Trophy size={20} style={{ color: "#FFD66E" }} /> 2nd</span>} />
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
+      {/* PROJECTS */}
+      <section id="projects" className="relative scroll-mt-20 py-28">
+        <div className="mx-auto max-w-6xl px-5">
+          <SectionHeading kicker="02" title="Selected Work" />
+          <div className="sticky top-20 z-20 mt-10 -mx-5 overflow-x-auto px-5 pb-2">
+            <div className="inline-flex items-center gap-1 rounded-full border border-border bg-card/80 p-1 backdrop-blur-md">
+              {TABS.map((t) => {
+                const Icon = t.icon;
+                const isActive = tab === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => setTab(t.id)}
+                    className={`relative inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-colors ${isActive ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                  >
+                    {isActive && (
+                      <motion.span layoutId="tabpill" className="absolute inset-0 rounded-full" style={{ background: TEAL }} transition={{ type: "spring", stiffness: 400, damping: 35 }} />
+                    )}
+                    <span className="relative flex items-center gap-1.5"><Icon size={13} /> {t.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <div className="mt-8">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={tab}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.35 }}
+                className="grid gap-5 md:grid-cols-2"
+              >
+                {PROJECTS[tab].map((p, i) => (
+                  <ProjectCard key={p.name + i} project={p} hero={!!p.hero} />
+                ))}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+      </section>
+
+      {/* SKILLS */}
+      <section id="skills" className="relative scroll-mt-20 py-28">
+        <div className="mx-auto max-w-6xl px-5">
+          <SectionHeading kicker="03" title="Toolkit" />
+          <div className="mt-12 grid gap-6 md:grid-cols-2">
+            {SKILLS.map((s, idx) => (
+              <Reveal key={s.group} delay={idx * 0.05}>
+                <div className="rounded-2xl border border-border bg-card/50 p-6">
+                  <div className="mb-4 flex items-center justify-between">
+                    <h3 className="font-display text-xl">{s.group}</h3>
+                    <span className="text-[10px] uppercase tracking-widest text-muted-foreground">{s.items.length}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {s.items.map((t) => (
+                      <span key={t} className="group relative overflow-hidden rounded-md border border-border bg-background/60 px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:border-[color:var(--color-teal)]/50 hover:text-foreground">
+                        <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-[color:var(--color-teal)]/15 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* EXPERIENCE */}
+      <section id="experience" className="relative scroll-mt-20 py-28">
+        <div className="mx-auto max-w-6xl px-5">
+          <SectionHeading kicker="04" title="Experience & Achievements" />
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            <Reveal className="md:col-span-2">
+              <div className="space-y-5">
+                <TimelineItem
+                  icon={<Briefcase size={16} />}
+                  title="Odoo Designer — AI Training Datasets"
+                  org="ConDigital Inc."
+                  meta="Contractor · Current · Addis Ababa"
+                  body="Designing Odoo website content and data funnels for AI training datasets. Specializing in Website and CRM modules — applying SEO optimization, lead-generation tagging and data-driven content strategy across multiple client builds."
+                />
+                <TimelineItem
+                  icon={<Award size={16} />}
+                  title="AI/ML Student — GDG Program"
+                  org="Google Developer Groups · AASTU"
+                  meta="Nov 2025 – Present · 50% complete"
+                  body="Structured ML curriculum covering data handling, ML fundamentals, model training and applied problem-solving in Python."
+                />
+                <TimelineItem
+                  icon={<Award size={16} />}
+                  title="Cardano Blockchain Hackathon"
+                  org="Team CATs Group 2"
+                  meta="Blockchain Developer"
+                  body="Smart contracts and blockchain application logic under competition conditions."
+                />
+              </div>
+              <div className="mt-8">
+                <h4 className="text-xs uppercase tracking-widest text-muted-foreground">Certifications</h4>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="rounded-md border border-border bg-card/50 px-3 py-1.5 text-xs">C++ — SoloLearn</span>
+                  <span className="rounded-md border border-border bg-card/50 px-3 py-1.5 text-xs">Web Development — FreeCodeCamp</span>
+                </div>
+              </div>
+            </Reveal>
+            <Reveal delay={0.1}>
+              <div className="relative overflow-hidden rounded-2xl border p-6" style={{ borderColor: "rgba(255,214,110,0.4)", background: "linear-gradient(160deg, rgba(255,214,110,0.08), transparent 70%)" }}>
+                <Trophy size={36} style={{ color: "#FFD66E" }} />
+                <p className="mt-3 text-[10px] uppercase tracking-widest" style={{ color: "#FFD66E" }}>Highlighted Achievement</p>
+                <h3 className="mt-1 font-display text-2xl leading-tight">2nd Place — GDG AASTU AI/ML Hackathon</h3>
+                <p className="mt-3 text-sm text-muted-foreground">Built and deployed PriceGuard-AI, an ML-powered price recommendation tool, placing 2nd in the AI/ML track. 2025.</p>
+                <a href="https://price-guard-ai.vercel.app/" target="_blank" rel="noreferrer noopener" className="mt-5 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest transition-colors hover:text-foreground" style={{ color: "#FFD66E" }}>
+                  See project <ExternalLink size={12} />
+                </a>
+              </div>
+            </Reveal>
+          </div>
+
+          {/* Education */}
+          <div className="mt-10">
+            <Reveal>
+              <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-border bg-card/50 p-6 md:flex-row md:items-center">
+                <div className="flex items-start gap-4">
+                  <div className="rounded-xl border border-border bg-background p-3"><GraduationCap size={20} style={{ color: TEAL }} /></div>
+                  <div>
+                    <h3 className="font-display text-xl">Bachelor of Software Engineering</h3>
+                    <p className="text-sm text-muted-foreground">Addis Ababa Science and Technology University (AASTU)</p>
+                    <p className="mt-1 text-xs text-muted-foreground">Self-taught developer since January 2022.</p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <span className="rounded-md border px-3 py-1.5 text-xs font-semibold" style={{ borderColor: "rgba(0,255,209,0.4)", color: TEAL }}>CGPA 3.56</span>
+                  <span className="rounded-md border border-border px-3 py-1.5 text-xs">Expected June 2027</span>
+                </div>
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
+      {/* CONTACT */}
+      <section id="contact" className="relative scroll-mt-20 py-28">
+        <div className="mx-auto max-w-4xl px-5 text-center">
+          <SectionHeading kicker="05" title="Let's build something" centered />
+          <Reveal delay={0.1}>
+            <p className="mx-auto mt-6 max-w-xl text-muted-foreground">
+              I'm actively looking for internship opportunities in AI/ML or full-stack engineering. Let's talk.
+            </p>
+          </Reveal>
+          <Reveal delay={0.15}>
+            <div className="mt-10 flex flex-col items-center gap-4">
+              <button
+                onClick={copyEmail}
+                className="group inline-flex items-center gap-3 rounded-full border bg-card/60 px-6 py-3 text-sm font-semibold transition-colors hover:border-[color:var(--color-teal)]/60"
+                style={{ borderColor: "rgba(0,255,209,0.3)" }}
+              >
+                <Mail size={16} style={{ color: TEAL }} />
+                dagimtadesse25@gmail.com
+                {copied ? <Check size={14} style={{ color: TEAL }} /> : <Copy size={14} className="text-muted-foreground group-hover:text-foreground" />}
+              </button>
+              {copied && <span className="text-xs" style={{ color: TEAL }}>Copied to clipboard</span>}
+              <div className="mt-2 flex items-center gap-3">
+                <a href="https://github.com/Dagim-Tadesse" target="_blank" rel="noreferrer noopener" aria-label="GitHub" className="rounded-full border border-border bg-card/40 p-3 transition-colors hover:border-[color:var(--color-teal)]/60 hover:text-foreground"><Github size={18} /></a>
+                <a href="https://www.linkedin.com/in/dagim-tadesse-ba6b30263/" target="_blank" rel="noreferrer noopener" aria-label="LinkedIn" className="rounded-full border border-border bg-card/40 p-3 transition-colors hover:border-[color:var(--color-teal)]/60 hover:text-foreground"><Linkedin size={18} /></a>
+              </div>
+            </div>
+          </Reveal>
+          <Reveal delay={0.2}>
+            <ContactForm />
+          </Reveal>
+        </div>
+      </section>
+
+      <footer className="border-t border-border py-10">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-5 text-xs text-muted-foreground md:flex-row">
+          <p>Dagim Tadesse · Built in Addis Ababa 🇪🇹</p>
+          <div className="flex items-center gap-3">
+            <a href="https://github.com/Dagim-Tadesse" target="_blank" rel="noreferrer noopener" aria-label="GitHub"><Github size={16} /></a>
+            <a href="https://www.linkedin.com/in/dagim-tadesse-ba6b30263/" target="_blank" rel="noreferrer noopener" aria-label="LinkedIn"><Linkedin size={16} /></a>
+          </div>
+        </div>
+      </footer>
+
+      {/* Back to top */}
+      <AnimatePresence>
+        {showTop && (
+          <motion.button
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            aria-label="Back to top"
+            className="fixed bottom-6 right-6 z-40 rounded-full border border-border bg-card/80 p-3 backdrop-blur-md transition-colors hover:border-[color:var(--color-teal)]/60"
+          >
+            <ArrowUp size={16} style={{ color: TEAL }} />
+          </motion.button>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function SectionHeading({ kicker, title, centered = false }: { kicker: string; title: string; centered?: boolean }) {
   return (
     <Reveal>
-      <div className="mb-12 md:mb-16">
-        <div className="flex items-center gap-3 font-mono text-xs text-primary uppercase tracking-[0.3em] mb-4">
-          <span className="h-px w-8 bg-primary" />
-          {tag}
-        </div>
-        <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold leading-tight max-w-3xl">
-          {title}
-        </h2>
+      <div className={centered ? "text-center" : ""}>
+        <p className="text-[10px] uppercase tracking-[0.4em]" style={{ color: TEAL }}>/ {kicker}</p>
+        <h2 className="mt-3 font-display text-4xl font-bold tracking-tight md:text-5xl">{title}</h2>
       </div>
     </Reveal>
   );
 }
 
-function About() {
-  const stats = [
-    { v: "Final", l: "Year (2 mo to 5th)" },
-    { v: "10+", l: "Live Projects" },
-    { v: "AI/ML", l: "Focus Track" },
-  ];
+function StatCard({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <section id="about" className="relative py-28 md:py-40 px-6 lg:px-10">
-      <div className="max-w-7xl mx-auto">
-        <SectionHeading
-          tag="01 / About"
-          title="A serious young engineer, not a student template."
-        />
-        <div className="grid lg:grid-cols-5 gap-10 lg:gap-16">
-          <Reveal className="lg:col-span-3">
-            <div className="space-y-5 text-base md:text-lg leading-relaxed text-muted-foreground">
-              <p>
-                I'm a final-year Software Engineering student at{" "}
-                <span className="text-foreground">
-                  Addis Ababa Science and Technology University
-                </span>{" "}
-                and currently working as a contracted{" "}
-                <span className="text-foreground">Odoo Designer for AI training datasets at ConDigital Inc.</span>
-              </p>
-              <p>
-                I build things that are <span className="text-primary">live and usable</span> —
-                finance trackers, AI price tools, flashcard apps — and compete in AI/ML hackathons.
-                I'm 50% through the GDG structured ML curriculum and shipping projects every month.
-              </p>
-              <p>
-                Driven by curiosity, disciplined by habit, and looking for an internship where I can
-                work on real problems in{" "}
-                <span className="text-foreground">AI, data, or full-stack engineering.</span>
-              </p>
-              <div className="pt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 font-mono text-xs text-primary">
-                <Sparkles className="h-3.5 w-3.5" />
-                Currently open to internships in AI/ML or Full-Stack
-              </div>
-            </div>
-          </Reveal>
-          <Reveal delay={0.15} className="lg:col-span-2">
-            <div className="grid grid-cols-2 gap-4">
-              {stats.map((s) => (
-                <div
-                  key={s.l}
-                  className="relative p-6 rounded-2xl bg-surface border border-border hover:border-primary/40 transition-colors group overflow-hidden"
-                >
-                  <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full bg-primary/10 blur-2xl group-hover:bg-primary/20 transition" />
-                  <div className="relative">
-                    <div className="font-display text-4xl md:text-5xl font-bold text-primary">
-                      {s.v}
-                    </div>
-                    <div className="mt-2 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-                      {s.l}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Reveal>
-        </div>
-      </div>
-    </section>
+    <div className="rounded-2xl border border-border bg-card/50 p-5 transition-colors hover:border-[color:var(--color-teal)]/40">
+      <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</p>
+      <p className="mt-2 font-display text-3xl font-bold">{value}</p>
+    </div>
   );
 }
 
-function ProjectCard({
-  p,
-  large = false,
-  index,
-}: {
-  p: (typeof PROJECTS)[number];
-  large?: boolean;
-  index: number;
-}) {
+function ProjectCard({ project, hero }: { project: Project; hero?: boolean }) {
   return (
     <motion.article
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.6, delay: index * 0.08 }}
-      className={`group relative rounded-3xl border border-border bg-surface p-7 md:p-9 overflow-hidden accent-glow transition-all duration-500 hover:-translate-y-1 ${
-        large ? "md:col-span-2 md:row-span-2 lg:col-span-2 lg:row-span-2" : ""
-      }`}
+      whileHover={{ y: -4 }}
+      transition={{ type: "spring", stiffness: 260, damping: 20 }}
+      className={`group relative overflow-hidden rounded-2xl border border-border bg-card/60 p-6 transition-colors hover:border-[color:var(--color-teal)]/50 ${hero ? "md:col-span-2 md:p-8" : ""}`}
+      style={{ boxShadow: "0 1px 0 rgba(255,255,255,0.03) inset" }}
     >
-      {large && (
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent pointer-events-none" />
-      )}
-      <div className="absolute -top-32 -right-32 w-64 h-64 rounded-full bg-primary/5 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-
-      <div className="relative flex flex-col h-full">
-        {p.badge && (
-          <div className="inline-flex self-start items-center gap-2 mb-5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/30 font-mono text-[11px] text-primary">
-            <Trophy className="h-3 w-3" />
-            {p.badge}
+      <div aria-hidden className="pointer-events-none absolute -inset-x-10 -top-32 h-64 opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100" style={{ background: "radial-gradient(closest-side, rgba(0,255,209,0.18), transparent)" }} />
+      <div className="relative">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              {project.badges.map((b) => (
+                <span key={b} className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[10px] uppercase tracking-widest ${project.trophy ? "" : "border-border text-muted-foreground"}`}
+                  style={project.trophy ? { borderColor: "rgba(255,214,110,0.5)", color: "#FFD66E" } : undefined}>
+                  {b}
+                </span>
+              ))}
+            </div>
+            <h3 className={`mt-3 font-display font-bold tracking-tight ${hero ? "text-4xl md:text-5xl" : "text-2xl"}`}>{project.name}</h3>
+            {project.type && <p className="mt-1 text-xs text-muted-foreground">{project.type}</p>}
           </div>
-        )}
-        <h3
-          className={`font-display font-bold leading-tight ${large ? "text-4xl md:text-5xl" : "text-2xl md:text-3xl"}`}
-        >
-          {p.name}
-        </h3>
-        <p className="mt-3 font-mono text-xs uppercase tracking-wider text-primary">{p.tagline}</p>
-        <p
-          className={`mt-5 text-muted-foreground leading-relaxed ${large ? "text-base md:text-lg" : "text-sm"}`}
-        >
-          {p.description}
-        </p>
-
-        <div className="mt-6 flex flex-wrap gap-2">
-          {p.tech.map((t) => (
-            <span
-              key={t}
-              className="px-3 py-1 rounded-full border border-border bg-background/40 font-mono text-[11px] text-muted-foreground"
-            >
-              {t}
-            </span>
-          ))}
+          <div className="flex items-center gap-2">
+            {project.live && (
+              <a href={project.live} target="_blank" rel="noreferrer noopener" aria-label={`${project.name} live`}
+                className="rounded-full border border-border bg-background/50 p-2 transition-colors hover:border-[color:var(--color-teal)]/60 hover:text-foreground">
+                <ExternalLink size={14} />
+              </a>
+            )}
+            {project.github && (
+              <a href={project.github} target="_blank" rel="noreferrer noopener" aria-label={`${project.name} github`}
+                className="rounded-full border border-border bg-background/50 p-2 transition-colors hover:border-[color:var(--color-teal)]/60 hover:text-foreground">
+                <Github size={14} />
+              </a>
+            )}
+          </div>
         </div>
-
-        <div className="mt-auto pt-8 flex items-center gap-3">
-          {p.live && (
-            <a
-              href={p.live}
-              target="_blank"
-              rel="noreferrer"
-              aria-label={`${p.name} live site`}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-primary-foreground font-mono text-xs font-semibold hover:shadow-[0_0_30px_-8px_oklch(0.88_0.18_180/0.6)] transition"
-            >
-              <ExternalLink className="h-3.5 w-3.5" />
-              Live
-            </a>
-          )}
-          {p.github && (
-            <a
-              href={p.github}
-              target="_blank"
-              rel="noreferrer"
-              aria-label={`${p.name} GitHub`}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border hover:border-primary/50 font-mono text-xs font-semibold transition"
-            >
-              <Github className="h-3.5 w-3.5" />
-              Code
-            </a>
-          )}
-          <ArrowUpRight className="ml-auto h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:rotate-12 transition-all" />
+        <p className={`mt-4 font-display ${hero ? "text-xl" : "text-base"}`} style={{ color: TEAL }}>{project.tagline}</p>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{project.description}</p>
+        <div className="mt-5 flex flex-wrap gap-1.5">
+          {project.stack.map((s) => (
+            <span key={s} className="rounded-md border border-border bg-background/50 px-2 py-0.5 text-[10px] uppercase tracking-widest text-muted-foreground">{s}</span>
+          ))}
         </div>
       </div>
     </motion.article>
   );
 }
 
-function Projects() {
+function TimelineItem({ icon, title, org, meta, body }: { icon: React.ReactNode; title: string; org: string; meta: string; body: string }) {
   return (
-    <section
-      id="projects"
-      className="relative py-28 md:py-40 px-6 lg:px-10 bg-gradient-to-b from-transparent via-surface/30 to-transparent"
-    >
-      <div className="max-w-7xl mx-auto">
-        <SectionHeading
-          tag="02 / Selected Work"
-          title="Live products. Real users. Hackathon-tested."
-        />
-        <div className="grid md:grid-cols-2 gap-5 md:gap-6 auto-rows-fr">
-          {PROJECTS.map((p, i) => (
-            <ProjectCard key={p.name} p={p} index={i} />
-          ))}
+    <div className="relative rounded-2xl border border-border bg-card/50 p-6">
+      <div className="flex items-start gap-4">
+        <div className="rounded-xl border border-border bg-background p-2.5" style={{ color: TEAL }}>{icon}</div>
+        <div className="flex-1">
+          <h3 className="font-display text-lg">{title}</h3>
+          <p className="text-sm text-muted-foreground">{org}</p>
+          <p className="mt-1 text-[11px] uppercase tracking-widest text-muted-foreground/80">{meta}</p>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{body}</p>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
 
-function Skills() {
-  return (
-    <section id="skills" className="relative py-28 md:py-40 px-6 lg:px-10">
-      <div className="max-w-7xl mx-auto">
-        <SectionHeading tag="03 / Stack" title="The tools I reach for." />
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {SKILLS.map((group, i) => {
-            const Icon = group.icon;
-            return (
-              <Reveal key={group.label} delay={i * 0.05}>
-                <div className="h-full p-6 rounded-2xl border border-border bg-surface hover:border-primary/30 transition-colors">
-                  <div className="flex items-center gap-3 mb-5">
-                    <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                      <Icon className="h-4 w-4" />
-                    </div>
-                    <h3 className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                      {group.label}
-                    </h3>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {group.items.map((s) => (
-                      <span
-                        key={s}
-                        className="px-3 py-1.5 rounded-full bg-background border border-border font-mono text-[12px] text-foreground/90 hover:border-primary/50 hover:text-primary transition"
-                      >
-                        {s}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </Reveal>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
+type GhEvent = { id: string; type: string; created_at: string; repo: { name: string }; payload: { commits?: { message: string }[] } };
 
-function Experience() {
-  const items = [
-    {
-      icon: Briefcase,
-      role: "Odoo Designer — AI Training Datasets",
-      org: "ConDigital Inc.",
-      period: "Contractor · Current",
-      loc: "Addis Ababa, Ethiopia",
-      desc: "Designing Odoo website content and data funnels for AI training datasets. Specializing in Website and CRM modules — applying SEO optimization, lead-gen tagging, and data-driven content strategy across multiple industry client builds.",
-    },
-    {
-      icon: Cpu,
-      role: "AI/ML Student — GDG Program",
-      org: "Google Developer Groups · AASTU Chapter",
-      period: "Nov 2025 – Present (50% complete)",
-      desc: "Active participant in a structured AI/ML curriculum covering data handling, ML fundamentals, model training, and applied problem-solving in Python.",
-    },
-  ];
-  const achievements = [
-    {
-      icon: Award,
-      title: "Cardano Blockchain Hackathon Participant",
-      sub: "Blockchain Developer · Team CATs Group 2",
-      desc: "Worked on smart contracts and blockchain application logic under competition conditions.",
-      featured: true,
-    },
-  ];
-  return (
-    <section
-      id="experience"
-      className="relative py-28 md:py-40 px-6 lg:px-10 bg-gradient-to-b from-transparent via-surface/30 to-transparent"
-    >
-      <div className="max-w-7xl mx-auto">
-        <SectionHeading tag="04 / Experience & Wins" title="Shipped, contracted, and competed." />
-
-        <div className="grid lg:grid-cols-5 gap-6">
-          <div className="lg:col-span-3 space-y-5">
-            {items.map((e, i) => {
-              const Icon = e.icon;
-              return (
-                <Reveal key={e.role} delay={i * 0.08}>
-                  <div className="relative p-6 md:p-8 rounded-2xl border border-border bg-surface hover:border-primary/40 transition-colors">
-                    <div className="flex items-start gap-4">
-                      <div className="p-2.5 rounded-xl bg-primary/10 text-primary">
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-display text-xl md:text-2xl font-semibold leading-tight">
-                          {e.role}
-                        </h3>
-                        <div className="mt-1.5 font-mono text-xs text-primary">{e.org}</div>
-                        <div className="mt-1 font-mono text-[11px] text-muted-foreground uppercase tracking-wider">
-                          {e.period} {e.loc && `· ${e.loc}`}
-                        </div>
-                        <p className="mt-4 text-sm md:text-base text-muted-foreground leading-relaxed">
-                          {e.desc}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </Reveal>
-              );
-            })}
-          </div>
-
-          <div className="lg:col-span-2 space-y-5">
-            {achievements.map((a, i) => {
-              const Icon = a.icon;
-              return (
-                <Reveal key={a.title} delay={i * 0.08}>
-                  <div
-                    className={`relative p-6 rounded-2xl border overflow-hidden ${
-                      a.featured
-                        ? "border-primary/40 bg-gradient-to-br from-primary/15 via-surface to-surface"
-                        : "border-border bg-surface"
-                    }`}
-                  >
-                    {a.featured && (
-                      <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full bg-primary/20 blur-3xl" />
-                    )}
-                    <div className="relative">
-                      <div
-                        className={`inline-flex p-2.5 rounded-xl mb-4 ${
-                          a.featured
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-primary/10 text-primary"
-                        }`}
-                      >
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <h3 className="font-display text-lg font-semibold leading-tight">
-                        {a.title}
-                      </h3>
-                      <div className="mt-1 font-mono text-[11px] text-primary uppercase tracking-wider">
-                        {a.sub}
-                      </div>
-                      <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{a.desc}</p>
-                    </div>
-                  </div>
-                </Reveal>
-              );
-            })}
-            <Reveal>
-              <div className="p-6 rounded-2xl border border-border bg-surface">
-                <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground mb-3">
-                  Certifications
-                </div>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-center gap-2">
-                    <span className="h-1 w-1 rounded-full bg-primary" /> C++ Programming — SoloLearn
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="h-1 w-1 rounded-full bg-primary" /> Web Development —
-                    FreeCodeCamp
-                  </li>
-                </ul>
-              </div>
-            </Reveal>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Education() {
-  return (
-    <section id="education" className="relative py-20 md:py-28 px-6 lg:px-10">
-      <div className="max-w-7xl mx-auto">
-        <Reveal>
-          <div className="relative p-8 md:p-12 rounded-3xl border border-border bg-surface overflow-hidden">
-            <div className="absolute inset-0 grid-bg opacity-40 [mask-image:radial-gradient(ellipse_at_top_right,black,transparent_70%)]" />
-            <div className="relative grid md:grid-cols-3 gap-8 items-center">
-              <div className="md:col-span-2">
-                <div className="flex items-center gap-3 font-mono text-xs text-primary uppercase tracking-[0.3em] mb-4">
-                  <GraduationCap className="h-4 w-4" />
-                  05 / Education
-                </div>
-                <h3 className="font-display text-3xl md:text-4xl font-bold leading-tight">
-                  Bachelor of Software Engineering
-                </h3>
-                <p className="mt-3 font-mono text-sm text-muted-foreground">
-                  Addis Ababa Science and Technology University (AASTU) · Expected June 2027
-                </p>
-                <p className="mt-5 text-sm md:text-base text-muted-foreground leading-relaxed max-w-2xl">
-                  Self-taught developer since January 2022 — built C++/Java programs, static web
-                  apps, and relational database systems independently before entering formal ML
-                  training.
-                </p>
-              </div>
-              <div className="flex flex-col items-start md:items-end gap-3">
-                <div className="px-5 py-3 rounded-2xl border border-primary/40 bg-primary/10">
-                  <div className="font-mono text-[10px] uppercase tracking-wider text-primary">
-                    Live Projects
-                  </div>
-                  <div className="font-display text-4xl font-bold text-primary">10+</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
-function Contact() {
-  return (
-    <section id="contact" className="relative py-28 md:py-40 px-6 lg:px-10 overflow-hidden">
-      <div className="absolute inset-0 radial-glow" />
-      <div className="relative max-w-5xl mx-auto text-center">
-        <Reveal>
-          <div className="font-mono text-xs text-primary uppercase tracking-[0.3em] mb-6">
-            06 / Contact
-          </div>
-          <h2 className="font-display text-5xl md:text-7xl lg:text-8xl font-bold leading-[0.95] text-balance">
-            Let's build <span className="italic text-primary">something real.</span>
-          </h2>
-          <p className="mt-8 max-w-2xl mx-auto text-base md:text-lg text-muted-foreground leading-relaxed">
-            I'm actively looking for internship opportunities in AI/ML or full-stack engineering. If
-            you're hiring or collaborating, my inbox is open.
-          </p>
-          <div className="mt-10">
-            <a
-              href="mailto:dagimtadesse25@gmail.com"
-              className="group inline-flex items-center gap-2 bg-primary text-primary-foreground font-mono text-sm font-semibold px-7 py-4 rounded-full hover:shadow-[0_0_50px_-8px_oklch(0.88_0.18_180/0.7)] transition-all"
-            >
-              <Mail className="h-4 w-4" />
-              dagimtadesse25@gmail.com
-              <ArrowUpRight className="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </a>
-          </div>
-          <div className="mt-8 flex items-center justify-center gap-4">
-            <a
-              href="https://github.com/Dagim-Tadesse"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="GitHub"
-              className="p-3 rounded-full border border-border hover:border-primary/50 hover:text-primary transition"
-            >
-              <Github className="h-5 w-5" />
-            </a>
-            <a
-              href="https://www.linkedin.com/in/dagim-tadesse-ba6b30263/"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="LinkedIn"
-              className="p-3 rounded-full border border-border hover:border-primary/50 hover:text-primary transition"
-            >
-              <Linkedin className="h-5 w-5" />
-            </a>
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="border-t border-border px-6 lg:px-10 py-10">
-      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-xs text-muted-foreground">
-        <p>
-          © {new Date().getFullYear()} Dagim Tadesse · Built with{" "}
-          <span className="text-primary">♥</span> in Addis Ababa
-        </p>
-        <div className="flex items-center gap-3">
-          <a
-            href="https://github.com/Dagim-Tadesse"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="GitHub"
-            className="hover:text-primary transition"
-          >
-            <Github className="h-4 w-4" />
-          </a>
-          <a
-            href="https://www.linkedin.com/in/dagim-tadesse-ba6b30263/"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="LinkedIn"
-            className="hover:text-primary transition"
-          >
-            <Linkedin className="h-4 w-4" />
-          </a>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
-function ClientOnly({ children }: { children: React.ReactNode }) {
-  const [mounted, setMounted] = React.useState(false);
-  React.useEffect(() => {
-    setMounted(true);
+function GitHubStrip() {
+  const [event, setEvent] = useState<GhEvent | null>(null);
+  const [err, setErr] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    fetch("https://api.github.com/users/Dagim-Tadesse/events/public?per_page=10")
+      .then((r) => r.ok ? r.json() : Promise.reject(r.status))
+      .then((events: GhEvent[]) => {
+        if (cancelled) return;
+        const push = events.find((e) => e.type === "PushEvent" && e.payload?.commits?.length) ?? events[0];
+        if (push) setEvent(push);
+      })
+      .catch(() => !cancelled && setErr(true));
+    return () => { cancelled = true; };
   }, []);
 
-  if (!mounted) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center font-mono text-xs text-muted-foreground animate-pulse">
-        Loading experience...
-      </div>
-    );
-  }
+  const message = useMemo(() => {
+    if (!event) return null;
+    const commits = event.payload?.commits;
+    return commits && commits.length ? commits[commits.length - 1].message.split("\n")[0] : event.type.replace("Event", "");
+  }, [event]);
 
-  return <>{children}</>;
+  if (err) return null;
+  return (
+    <a href="https://github.com/Dagim-Tadesse" target="_blank" rel="noreferrer noopener"
+      className="inline-flex max-w-full items-center gap-3 rounded-full border border-border bg-card/40 px-4 py-2 text-xs text-muted-foreground transition-colors hover:border-[color:var(--color-teal)]/50 hover:text-foreground">
+      <GitCommit size={14} style={{ color: TEAL }} />
+      {event && message ? (
+        <>
+          <span className="hidden sm:inline text-foreground/90 truncate max-w-[280px]">{message}</span>
+          <span className="text-muted-foreground/80 truncate max-w-[180px]">{event.repo.name}</span>
+          <span className="text-muted-foreground/60">· {timeAgo(event.created_at)}</span>
+        </>
+      ) : (
+        <span>Loading latest GitHub activity…</span>
+      )}
+    </a>
+  );
 }
 
-function Portfolio() {
+function timeAgo(iso: string) {
+  const s = (Date.now() - new Date(iso).getTime()) / 1000;
+  if (s < 60) return `${Math.floor(s)}s ago`;
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+  if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+  return `${Math.floor(s / 86400)}d ago`;
+}
+
+function ContactForm() {
+  const [state, setState] = useState<"idle" | "ok">("idle");
+  const [data, setData] = useState({ name: "", email: "", message: "" });
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const subject = encodeURIComponent(`Portfolio inquiry from ${data.name || "Anonymous"}`);
+    const body = encodeURIComponent(`${data.message}\n\n— ${data.name} (${data.email})`);
+    window.location.href = `mailto:dagimtadesse25@gmail.com?subject=${subject}&body=${body}`;
+    setState("ok");
+  };
   return (
-    <ClientOnly>
-      <main className="relative bg-background text-foreground">
-        <Nav />
-        <Hero />
-        <About />
-        <Projects />
-        <Skills />
-        <Experience />
-        <Education />
-        <Contact />
-        <Footer />
-      </main>
-    </ClientOnly>
+    <form onSubmit={submit} className="mx-auto mt-12 grid max-w-xl gap-3 text-left">
+      <div className="grid gap-3 sm:grid-cols-2">
+        <input required value={data.name} onChange={(e) => setData({ ...data, name: e.target.value })} placeholder="Your name"
+          className="rounded-lg border border-border bg-card/50 px-4 py-3 text-sm outline-none transition-colors focus:border-[color:var(--color-teal)]/60" />
+        <input required type="email" value={data.email} onChange={(e) => setData({ ...data, email: e.target.value })} placeholder="Email"
+          className="rounded-lg border border-border bg-card/50 px-4 py-3 text-sm outline-none transition-colors focus:border-[color:var(--color-teal)]/60" />
+      </div>
+      <textarea required rows={4} value={data.message} onChange={(e) => setData({ ...data, message: e.target.value })} placeholder="Tell me about the role or project…"
+        className="rounded-lg border border-border bg-card/50 px-4 py-3 text-sm outline-none transition-colors focus:border-[color:var(--color-teal)]/60" />
+      <button type="submit" className="self-end rounded-full px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-transform hover:-translate-y-0.5"
+        style={{ background: TEAL }}>
+        {state === "ok" ? "Opening mail…" : "Send message"}
+      </button>
+    </form>
   );
 }
