@@ -475,7 +475,7 @@ function Portfolio() {
           <div className="mt-12 grid gap-12 md:grid-cols-2 md:gap-16">
             <Reveal>
               <p className="text-lg leading-relaxed text-muted-foreground">
-                I'm a final-year Software Engineering student at <span className="text-foreground">AASTU (CGPA 3.56)</span>, currently working as a contracted Odoo Designer for AI training datasets at <span className="text-foreground">ConDigital Inc.</span> I build things that are live and usable — finance trackers, AI price tools, flashcard apps, and mobile experiences.
+                I'm a final-year Software Engineering student at <span className="text-foreground">AASTU</span>, currently working as a contracted Odoo Designer for AI training datasets at <span className="text-foreground">ConDigital Inc.</span> I build things that are live and usable — finance trackers, AI price tools, flashcard apps, and mobile experiences.
                 <br /><br />
                 I placed <span className="text-foreground">2nd in the GDG AASTU AI/ML Hackathon</span> with PriceGuard-AI and I'm actively training in the GDG ML curriculum. Driven by curiosity, disciplined by habit, looking for an internship where I can work on real problems in AI, data, or full-stack engineering.
               </p>
@@ -485,9 +485,8 @@ function Portfolio() {
             </Reveal>
             <Reveal delay={0.1}>
               <div className="grid grid-cols-2 gap-4">
-                <StatCard label="CGPA" value={<Counter to={3.56} decimals={2} />} />
                 <StatCard label="Graduation" value="2027" />
-                <StatCard label="Public Repos" value={<><Counter to={6} />+</>} />
+                <StatCard label="Public Repos" value={<><Counter to={10} />+</>} />
                 <StatCard label="Hackathon" value={<span className="inline-flex items-center gap-1.5"><Trophy size={20} style={{ color: "#FFD66E" }} /> 2nd</span>} />
               </div>
             </Reveal>
@@ -545,7 +544,7 @@ function Portfolio() {
           <div className="mt-12 grid gap-6 md:grid-cols-2">
             {SKILLS.map((s, idx) => (
               <Reveal key={s.group} delay={idx * 0.05}>
-                <div className="rounded-2xl border border-border bg-card/50 p-6">
+                <div className="rounded-2xl border border-[color:var(--color-teal)]/20 bg-[color:var(--color-teal)]/10 backdrop-blur-md p-6 shadow-lg transition-colors hover:bg-[color:var(--color-teal)]/15 hover:border-[color:var(--color-teal)]/40">
                   <div className="mb-4 flex items-center justify-between">
                     <h3 className="font-display text-xl">{s.group}</h3>
                     <span className="text-[10px] uppercase tracking-widest text-muted-foreground">{s.items.length}</span>
@@ -628,8 +627,7 @@ function Portfolio() {
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <span className="rounded-md border px-3 py-1.5 text-xs font-semibold" style={{ borderColor: "rgba(0,255,209,0.4)", color: TEAL }}>CGPA 3.56</span>
-                  <span className="rounded-md border border-border px-3 py-1.5 text-xs">Expected June 2027</span>
+                  <span className="rounded-md border px-3 py-1.5 text-xs font-semibold" style={{ borderColor: "rgba(0,255,209,0.4)", color: TEAL }}>Expected June 2027</span>
                 </div>
               </div>
             </Reveal>
@@ -710,7 +708,7 @@ function SectionHeading({ kicker, title, centered = false }: { kicker: string; t
 
 function StatCard({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-border bg-card/50 p-5 transition-colors hover:border-[color:var(--color-teal)]/40">
+    <div className="rounded-2xl border border-[color:var(--color-teal)]/20 bg-[color:var(--color-teal)]/10 backdrop-blur-md p-5 transition-all hover:border-[color:var(--color-teal)]/40 hover:bg-[color:var(--color-teal)]/15 hover:shadow-lg hover:shadow-[color:var(--color-teal)]/10">
       <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</p>
       <p className="mt-2 font-display text-3xl font-bold">{value}</p>
     </div>
@@ -722,8 +720,8 @@ function ProjectCard({ project, hero }: { project: Project; hero?: boolean }) {
     <motion.article
       whileHover={{ y: -4 }}
       transition={{ type: "spring", stiffness: 260, damping: 20 }}
-      className={`group relative overflow-hidden rounded-2xl border border-border bg-card/60 p-6 transition-colors hover:border-[color:var(--color-teal)]/50 ${hero ? "md:col-span-2 md:p-8" : ""}`}
-      style={{ boxShadow: "0 1px 0 rgba(255,255,255,0.03) inset" }}
+      className={`group relative overflow-hidden rounded-2xl border border-[color:var(--color-teal)]/20 bg-[color:var(--color-teal)]/10 backdrop-blur-md p-6 transition-all hover:border-[color:var(--color-teal)]/50 hover:bg-[color:var(--color-teal)]/15 hover:shadow-xl hover:shadow-[color:var(--color-teal)]/20 ${hero ? "md:col-span-2 md:p-8" : ""}`}
+      style={{ boxShadow: "0 4px 20px -2px rgba(0,0,0,0.4), 0 1px 0 rgba(0,255,209,0.15) inset" }}
     >
       <div aria-hidden className="pointer-events-none absolute -inset-x-10 -top-32 h-64 opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100" style={{ background: "radial-gradient(closest-side, rgba(0,255,209,0.18), transparent)" }} />
       <div className="relative">
@@ -769,7 +767,7 @@ function ProjectCard({ project, hero }: { project: Project; hero?: boolean }) {
 
 function TimelineItem({ icon, title, org, meta, body }: { icon: React.ReactNode; title: string; org: string; meta: string; body: string }) {
   return (
-    <div className="relative rounded-2xl border border-border bg-card/50 p-6">
+    <div className="relative rounded-2xl border border-[color:var(--color-teal)]/20 bg-[color:var(--color-teal)]/10 backdrop-blur-md p-6 shadow-lg transition-colors hover:bg-[color:var(--color-teal)]/15 hover:border-[color:var(--color-teal)]/40">
       <div className="flex items-start gap-4">
         <div className="rounded-xl border border-border bg-background p-2.5" style={{ color: TEAL }}>{icon}</div>
         <div className="flex-1">
