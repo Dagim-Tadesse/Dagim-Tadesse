@@ -92,8 +92,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Dagim's Digital Canvas is a personal portfolio website showcasing a Software Engineering student's skills." },
       { property: "og:description", content: "Dagim's Digital Canvas is a personal portfolio website showcasing a Software Engineering student's skills." },
       { name: "twitter:description", content: "Dagim's Digital Canvas is a personal portfolio website showcasing a Software Engineering student's skills." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7a6e1230-c155-43c7-bd47-6a24883092cc/id-preview-a7ca53b6--cced11b6-1fa3-49a5-99dd-802988b294c8.lovable.app-1778322765802.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7a6e1230-c155-43c7-bd47-6a24883092cc/id-preview-a7ca53b6--cced11b6-1fa3-49a5-99dd-802988b294c8.lovable.app-1778322765802.png" },
+      { property: "og:image", content: "https://dagim-tadesse.vercel.app/og-image.jpeg" },
+      { name: "twitter:image", content: "https://dagim-tadesse.vercel.app/og-image.jpeg" },
     ],
     links: [
       {
