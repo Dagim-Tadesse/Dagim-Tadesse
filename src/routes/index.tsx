@@ -556,10 +556,14 @@ function Portfolio() {
             <AnimatePresence mode="wait">
               <motion.div
                 key={tab}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.35 }}
+                variants={{
+                  hidden: { opacity: 0 },
+                  show: { opacity: 1, transition: { staggerChildren: 0.1 } },
+                  exit: { opacity: 0, y: -8, transition: { duration: 0.2 } }
+                }}
+                initial="hidden"
+                animate="show"
+                exit="exit"
                 className="grid gap-5 md:grid-cols-2"
               >
                 {PROJECTS[tab].map((p, i) => (
@@ -603,8 +607,11 @@ function Portfolio() {
         <div className="mx-auto max-w-6xl px-5">
           <SectionHeading kicker="04" title="Experience & Achievements" />
           <Reveal>
-            <div className="mt-12 mb-10 group relative overflow-hidden rounded-2xl border border-[color:var(--color-teal)]/20 bg-[color:var(--color-teal)]/10 backdrop-blur-md p-8 md:p-10 transition-all hover:border-[color:var(--color-teal)]/50 hover:bg-[color:var(--color-teal)]/15 hover:shadow-[0_0_30px_-5px_rgba(0,255,209,0.15)] border-l-4"
-              style={{ borderLeftColor: TEAL, boxShadow: "0 4px 20px -2px rgba(0,0,0,0.4), 0 1px 0 rgba(0,255,209,0.15) inset" }}>
+            <motion.div 
+              whileHover={{ y: -6, scale: 1.01 }}
+              transition={{ type: "spring", stiffness: 350, damping: 25 }}
+              className="mt-12 mb-10 group relative overflow-hidden rounded-2xl border border-[color:var(--color-teal)]/20 bg-[color:var(--color-teal)]/10 backdrop-blur-md p-8 md:p-10 transition-colors hover:border-[color:var(--color-teal)]/50 hover:bg-[color:var(--color-teal)]/15 border-l-4"
+              style={{ borderLeftColor: TEAL, boxShadow: "0 4px 20px -2px rgba(0,0,0,0.4), 0 1px 0 rgba(0,255,209,0.15) inset", willChange: "transform" }}>
               <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div>
                   <h3 className="font-display text-3xl font-bold tracking-tight md:text-4xl">Africom Tech</h3>
@@ -641,7 +648,7 @@ function Portfolio() {
                   "Led architecture decisions across a team of three as Tech Lead. Owned the core backend (Clean Architecture, JWT auth, Gemini AI integration, Lead ingestion API) and independently built the entire n8n social monitoring layer — a new integration slice added mid-project to extend the system's reach across LinkedIn, Twitter, Facebook, Instagram, and TikTok. Resolved a critical Gemini API authentication issue (header vs query param format) and kept the project on track to a live demo in 4 weeks."
                 </p>
               </div>
-            </div>
+            </motion.div>
           </Reveal>
 
           <div className="grid gap-6 md:grid-cols-3">
@@ -678,7 +685,10 @@ function Portfolio() {
               </div>
             </Reveal>
             <Reveal delay={0.1}>
-              <div className="relative overflow-hidden rounded-2xl border p-6" style={{ borderColor: "rgba(255,214,110,0.4)", background: "linear-gradient(160deg, rgba(255,214,110,0.08), transparent 70%)" }}>
+              <motion.div
+                whileHover={{ y: -4, scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                className="relative overflow-hidden rounded-2xl border p-6" style={{ borderColor: "rgba(255,214,110,0.4)", background: "linear-gradient(160deg, rgba(255,214,110,0.08), transparent 70%)", willChange: "transform" }}>
                 <Trophy size={36} style={{ color: "#FFD66E" }} />
                 <p className="mt-3 text-[10px] uppercase tracking-widest" style={{ color: "#FFD66E" }}>Highlighted Achievement</p>
                 <h3 className="mt-1 font-display text-2xl leading-tight">2nd Place — GDG AASTU AI/ML Hackathon</h3>
@@ -686,7 +696,7 @@ function Portfolio() {
                 <a href="https://price-guard-ai.vercel.app/" target="_blank" rel="noreferrer noopener" className="mt-5 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest transition-colors hover:text-foreground" style={{ color: "#FFD66E" }}>
                   See project <ExternalLink size={12} />
                 </a>
-              </div>
+              </motion.div>
             </Reveal>
           </div>
 
@@ -784,20 +794,27 @@ function SectionHeading({ kicker, title, centered = false }: { kicker: string; t
 
 function StatCard({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-[color:var(--color-teal)]/20 bg-[color:var(--color-teal)]/10 backdrop-blur-md p-5 transition-all hover:border-[color:var(--color-teal)]/40 hover:bg-[color:var(--color-teal)]/15 hover:shadow-lg hover:shadow-[color:var(--color-teal)]/10">
+    <motion.div 
+      whileHover={{ y: -4, scale: 1.02 }}
+      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+      style={{ willChange: "transform" }}
+      className="rounded-2xl border border-[color:var(--color-teal)]/20 bg-[color:var(--color-teal)]/10 backdrop-blur-md p-5 transition-colors hover:border-[color:var(--color-teal)]/40 hover:bg-[color:var(--color-teal)]/15">
       <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</p>
       <p className="mt-2 font-display text-3xl font-bold">{value}</p>
-    </div>
+    </motion.div>
   );
 }
 
 function ProjectCard({ project, hero }: { project: Project; hero?: boolean }) {
   return (
     <motion.article
-      whileHover={{ y: -4 }}
-      transition={{ type: "spring", stiffness: 260, damping: 20 }}
-      className={`group relative overflow-hidden rounded-2xl border border-[color:var(--color-teal)]/20 bg-[color:var(--color-teal)]/10 backdrop-blur-md p-6 transition-all hover:border-[color:var(--color-teal)]/50 hover:bg-[color:var(--color-teal)]/15 hover:shadow-xl hover:shadow-[color:var(--color-teal)]/20 ${hero ? "md:col-span-2 md:p-8" : ""}`}
-      style={{ boxShadow: "0 4px 20px -2px rgba(0,0,0,0.4), 0 1px 0 rgba(0,255,209,0.15) inset" }}
+      variants={{
+        hidden: { opacity: 0, y: 20 },
+        show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+      }}
+      whileHover={{ y: -6, scale: 1.02 }}
+      className={`group relative overflow-hidden rounded-2xl border border-[color:var(--color-teal)]/20 bg-[color:var(--color-teal)]/10 backdrop-blur-md p-6 transition-colors hover:border-[color:var(--color-teal)]/50 hover:bg-[color:var(--color-teal)]/15 ${hero ? "md:col-span-2 md:p-8" : ""}`}
+      style={{ boxShadow: "0 4px 20px -2px rgba(0,0,0,0.4), 0 1px 0 rgba(0,255,209,0.15) inset", willChange: "transform" }}
     >
       <div aria-hidden className="pointer-events-none absolute -inset-x-10 -top-32 h-64 opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100" style={{ background: "radial-gradient(closest-side, rgba(0,255,209,0.18), transparent)" }} />
       <div className="relative">
@@ -843,7 +860,11 @@ function ProjectCard({ project, hero }: { project: Project; hero?: boolean }) {
 
 function TimelineItem({ icon, title, org, meta, body }: { icon: React.ReactNode; title: string; org: string; meta: string; body: string }) {
   return (
-    <div className="relative rounded-2xl border border-[color:var(--color-teal)]/20 bg-[color:var(--color-teal)]/10 backdrop-blur-md p-6 shadow-lg transition-colors hover:bg-[color:var(--color-teal)]/15 hover:border-[color:var(--color-teal)]/40">
+    <motion.div
+      whileHover={{ x: 6 }}
+      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+      style={{ willChange: "transform" }}
+      className="relative rounded-2xl border border-[color:var(--color-teal)]/20 bg-[color:var(--color-teal)]/10 backdrop-blur-md p-6 shadow-lg transition-colors hover:bg-[color:var(--color-teal)]/15 hover:border-[color:var(--color-teal)]/40">
       <div className="flex items-start gap-4">
         <div className="rounded-xl border border-border bg-background p-2.5" style={{ color: TEAL }}>{icon}</div>
         <div className="flex-1">
@@ -853,7 +874,7 @@ function TimelineItem({ icon, title, org, meta, body }: { icon: React.ReactNode;
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{body}</p>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
