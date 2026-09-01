@@ -87,13 +87,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Building at the intersection of AI, data, and real software. Open to internships.",
       },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Dagim Tadesse — Software Engineer & AI/ML Developer" },
       { name: "description", content: "Dagim's Digital Canvas is a personal portfolio website showcasing a Software Engineering student's skills." },
       { property: "og:description", content: "Dagim's Digital Canvas is a personal portfolio website showcasing a Software Engineering student's skills." },
       { name: "twitter:description", content: "Dagim's Digital Canvas is a personal portfolio website showcasing a Software Engineering student's skills." },
-      { property: "og:image", content: "https://dagim-tadesse.vercel.app/og-image.jpeg" },
-      { name: "twitter:image", content: "https://dagim-tadesse.vercel.app/og-image.jpeg" },
+      { property: "og:image", content: "https://dagim-tadesse.vercel.app/og-image.jpeg?v=2" },
+      { name: "twitter:image", content: "https://dagim-tadesse.vercel.app/og-image.jpeg?v=2" },
     ],
     links: [
       {
