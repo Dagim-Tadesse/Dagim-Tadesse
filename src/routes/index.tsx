@@ -20,6 +20,12 @@ import {
   Copy,
   Check,
   GitCommit,
+  Brain,
+  ClipboardList,
+  Timer,
+  Link,
+  BarChart,
+  Lock,
 } from "lucide-react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
@@ -61,6 +67,16 @@ type TabId = (typeof TABS)[number]["id"];
 
 const PROJECTS: Record<TabId, Project[]> = {
   top: [
+    {
+      name: "Autonomous CRM Automation Agent",
+      badges: ["Internship · Africom Tech", "Tech Lead"],
+      type: "Group · Full-Stack AI",
+      tagline: "AI lead scoring, email drafting, and multi-platform social monitoring",
+      description:
+        "Led architecture across a 3-person team. Built the core ASP.NET Clean Architecture backend, integrated Google Gemini for lead scoring, and independently developed an n8n webhook layer for monitoring LinkedIn, Twitter, Facebook, Instagram, and TikTok data.",
+      stack: ["ASP.NET Core", "React", "Gemini AI", "n8n", "Hangfire"],
+      hero: true,
+    },
     {
       name: "PriceGuard-AI",
       badges: ["🏆 2nd Place — GDG AASTU Hackathon"],
@@ -105,6 +121,14 @@ const PROJECTS: Record<TabId, Project[]> = {
     },
   ],
   ai: [
+    {
+      name: "Autonomous CRM Automation Agent",
+      badges: ["Internship · Africom Tech", "Tech Lead"],
+      tagline: "AI lead scoring, email drafting, and multi-platform social monitoring",
+      description:
+        "Led architecture across a 3-person team. Built the core ASP.NET Clean Architecture backend, integrated Google Gemini for lead scoring, and independently developed an n8n webhook layer for monitoring LinkedIn, Twitter, Facebook, Instagram, and TikTok data.",
+      stack: ["ASP.NET Core", "React", "Gemini AI", "n8n", "Hangfire"],
+    },
     {
       name: "PriceGuard-AI",
       badges: ["🏆 2nd Place", "Group"],
@@ -214,6 +238,14 @@ const PROJECTS: Record<TabId, Project[]> = {
   ],
   web: [
     {
+      name: "Autonomous CRM Automation Agent",
+      badges: ["Internship · Africom Tech", "Tech Lead"],
+      tagline: "AI lead scoring, email drafting, and multi-platform social monitoring",
+      description:
+        "Led architecture across a 3-person team. Built the core ASP.NET Clean Architecture backend, integrated Google Gemini for lead scoring, and independently developed an n8n webhook layer for monitoring LinkedIn, Twitter, Facebook, Instagram, and TikTok data.",
+      stack: ["ASP.NET Core", "React", "Gemini AI", "n8n", "Hangfire"],
+    },
+    {
       name: "SpendWise",
       badges: ["Live · Full-Stack"],
       tagline: "Mobile-first personal finance tracker",
@@ -254,12 +286,12 @@ const PROJECTS: Record<TabId, Project[]> = {
 
 const SKILLS: { group: string; items: string[] }[] = [
   { group: "Languages", items: ["Python", "Java", "TypeScript", "JavaScript", "C++", "Dart", "PHP"] },
-  { group: "Frontend", items: ["React", "Vite", "HTML/CSS", "Tailwind", "Responsive Design"] },
+  { group: "Frontend", items: ["React", "Vite", "HTML/CSS", "Tailwind CSS", "Responsive Design"] },
   { group: "Mobile", items: ["Flutter", "Dart", "Mobile UI Design"] },
-  { group: "AI / Data", items: ["Machine Learning", "Data Preprocessing", "Model Training", "Computer Vision", "Jupyter"] },
-  { group: "Backend / DB", items: ["Supabase", "MySQL", "MS SQL Server", "REST APIs"] },
+  { group: "AI / Data", items: ["Machine Learning", "Google Gemini AI", "Data Preprocessing", "Model Training", "Computer Vision", "Jupyter"] },
+  { group: "Backend / DB", items: ["ASP.NET Core", "Clean Architecture", "Supabase", "SQL Server", "MySQL", "MS SQL Server", "REST APIs", "JWT", "Hangfire"] },
   { group: "ERP / Odoo", items: ["Odoo Website", "Odoo CRM", "AI Dataset Design", "Lead Generation"] },
-  { group: "Tools", items: ["Git", "GitHub", "Vercel", "VS Code", "Figma"] },
+  { group: "Tools", items: ["n8n", "Git", "GitHub", "Vercel", "VS Code", "Figma"] },
 ];
 
 const TYPING_PHRASES = [
@@ -475,9 +507,11 @@ function Portfolio() {
           <div className="mt-12 grid gap-12 md:grid-cols-2 md:gap-16">
             <Reveal>
               <p className="text-lg leading-relaxed text-muted-foreground">
-                I'm a final-year Software Engineering student at <span className="text-foreground">AASTU</span>, currently working as a contracted Odoo Designer for AI training datasets at <span className="text-foreground">ConDigital Inc.</span> I build things that are live and usable — finance trackers, AI price tools, flashcard apps, and mobile experiences.
+                Final-year Software Engineering student at AASTU. I build software that ships — ML systems, full-stack web apps, and mobile products that are live and used by real people.
                 <br /><br />
-                I placed <span className="text-foreground">2nd in the GDG AASTU AI/ML Hackathon</span> with PriceGuard-AI and I'm actively training in the GDG ML curriculum. Driven by curiosity, disciplined by habit, looking for an internship where I can work on real problems in AI, data, or full-stack engineering.
+                Most recently I led the technical architecture of an Autonomous CRM Automation Agent at Africom Tech — owning the backend, AI integration with Google Gemini, and a social media monitoring layer built with n8n across five platforms. I also train actively in the GDG ML curriculum and have shipped production projects in React, TypeScript, Flutter, and Python.
+                <br /><br />
+                I work across the full stack but my focus is AI engineering — building systems where the intelligence is the product.
               </p>
               <p className="mt-6 inline-flex items-center gap-2 rounded-md border border-[color:var(--color-teal)]/30 bg-[color:var(--color-teal)]/5 px-3 py-2 text-xs uppercase tracking-widest" style={{ color: TEAL }}>
                 <Sparkles size={14} /> Currently open to internships in AI/ML or Full-Stack
@@ -568,7 +602,49 @@ function Portfolio() {
       <section id="experience" className="relative scroll-mt-20 py-28">
         <div className="mx-auto max-w-6xl px-5">
           <SectionHeading kicker="04" title="Experience & Achievements" />
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
+          <Reveal>
+            <div className="mt-12 mb-10 group relative overflow-hidden rounded-2xl border border-[color:var(--color-teal)]/20 bg-[color:var(--color-teal)]/10 backdrop-blur-md p-8 md:p-10 transition-all hover:border-[color:var(--color-teal)]/50 hover:bg-[color:var(--color-teal)]/15 hover:shadow-[0_0_30px_-5px_rgba(0,255,209,0.15)] border-l-4"
+              style={{ borderLeftColor: TEAL, boxShadow: "0 4px 20px -2px rgba(0,0,0,0.4), 0 1px 0 rgba(0,255,209,0.15) inset" }}>
+              <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                <div>
+                  <h3 className="font-display text-3xl font-bold tracking-tight md:text-4xl">Africom Tech</h3>
+                  <p className="mt-2 text-lg font-medium text-foreground">Software Engineering Intern — Tech Lead</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Internship · 2 Months · Addis Ababa, Ethiopia</p>
+                </div>
+                <div>
+                  <span className="inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold tracking-widest uppercase" style={{ borderColor: TEAL, color: TEAL }}>Tech Lead</span>
+                </div>
+              </div>
+              <div className="mt-8">
+                <h4 className="font-display text-2xl font-bold">Autonomous CRM Automation Agent</h4>
+                <p className="mt-2 text-base text-muted-foreground">AI-powered lead scoring, email drafting, and social media monitoring — built on ASP.NET Core Clean Architecture with a React frontend.</p>
+                
+                <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                  {[
+                    { icon: Brain, label: "AI Lead Scoring & Emotion Detection" },
+                    { icon: Mail, label: "Automated Email Drafting" },
+                    { icon: ClipboardList, label: "Kanban Pipeline Management" },
+                    { icon: Timer, label: "Background Job Scheduling" },
+                    { icon: Link, label: "Social Media Monitoring" },
+                    { icon: BarChart, label: "Social Analytics Dashboard" },
+                    { icon: Lock, label: "Auth System" },
+                    { icon: Globe, label: "Multi-Platform Mock Data" },
+                  ].map((chip, i) => (
+                    <div key={i} className="flex items-center gap-2 rounded-full border border-border bg-background/50 px-3 py-2 text-xs font-medium text-muted-foreground">
+                      <chip.icon size={14} className="shrink-0" style={{ color: TEAL }} />
+                      <span>{chip.label}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <p className="mt-8 text-sm italic leading-relaxed text-muted-foreground">
+                  "Led architecture decisions across a team of three as Tech Lead. Owned the core backend (Clean Architecture, JWT auth, Gemini AI integration, Lead ingestion API) and independently built the entire n8n social monitoring layer — a new integration slice added mid-project to extend the system's reach across LinkedIn, Twitter, Facebook, Instagram, and TikTok. Resolved a critical Gemini API authentication issue (header vs query param format) and kept the project on track to a live demo in 4 weeks."
+                </p>
+              </div>
+            </div>
+          </Reveal>
+
+          <div className="grid gap-6 md:grid-cols-3">
             <Reveal className="md:col-span-2">
               <div className="space-y-5">
                 <TimelineItem
