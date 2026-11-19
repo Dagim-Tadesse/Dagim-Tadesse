@@ -38,12 +38,14 @@ import {
   ArrowRight,
   Zap,
   FileDown,
+  Box,
 } from "lucide-react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { HeroConsole } from "@/components/portfolio/hero-console";
 import { CommandMenu } from "@/components/portfolio/command-menu";
+import { InteractiveCube } from "@/components/portfolio/interactive-cube";
 import { PriceGuardChart } from "@/components/portfolio/priceguard-chart";
 import { CrmPipelineVisualizer } from "@/components/portfolio/crm-pipeline";
 import { GebeyaMockup } from "@/components/portfolio/gebeya-mockup";
@@ -551,6 +553,7 @@ function Portfolio() {
   const active = useScrollSpy(NAV.map((n) => n.id));
   const [showTop, setShowTop] = useState(false);
   const [cmdOpen, setCmdOpen] = useState(false);
+  const [heroVisual, setHeroVisual] = useState<"cube" | "console">("cube");
   const [tab, setTab] = useState<TabId>("top");
   const [skillSearch, setSkillSearch] = useState("");
   const { scrollYProgress } = useScroll();
@@ -829,18 +832,76 @@ function Portfolio() {
               </Reveal>
             </div>
 
-            {/* Right Column: High-Tech Interactive AI Core / Console */}
-            <div className="lg:col-span-6">
+            {/* Right Column: High-Tech Interactive AI Core & 3D Matrix Cube */}
+            <div className="lg:col-span-6 space-y-3">
               <Reveal delay={0.18}>
-                <HeroConsole />
+                <div className="flex items-center justify-between pb-1 px-1">
+                  <div className="inline-flex rounded-xl border border-white/10 bg-black/40 p-1 backdrop-blur-md">
+                    <button
+                      onClick={() => setHeroVisual("cube")}
+                      className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-mono text-xs font-semibold transition-all ${
+                        heroVisual === "cube"
+                          ? "bg-[#00ffd1]/20 text-[#00ffd1] border border-[#00ffd1]/40 shadow-[0_0_15px_rgba(0,255,209,0.2)]"
+                          : "text-slate-400 hover:text-white"
+                      }`}
+                    >
+                      <Box size={13} />
+                      <span>3D Matrix Cube</span>
+                    </button>
+                    <button
+                      onClick={() => setHeroVisual("console")}
+                      className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-mono text-xs font-semibold transition-all ${
+                        heroVisual === "console"
+                          ? "bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-[0_0_15px_rgba(168,85,247,0.2)]"
+                          : "text-slate-400 hover:text-white"
+                      }`}
+                    >
+                      <Cpu size={13} />
+                      <span>AI Pipeline Console</span>
+                    </button>
+                  </div>
+
+                  <span className="hidden sm:inline font-mono text-[10px] text-slate-500 uppercase tracking-widest">
+                    {heroVisual === "cube" ? "Spatial 3D" : "Lead Scoring"}
+                  </span>
+                </div>
+
+                <div className="mt-2">
+                  <AnimatePresence mode="wait">
+                    {heroVisual === "cube" ? (
+                      <motion.div
+                        key="cube"
+                        initial={{ opacity: 0, scale: 0.96 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.96 }}
+                        transition={{ duration: 0.25 }}
+                      >
+                        <InteractiveCube
+                          onNavigate={(secId) => scrollTo(secId)}
+                          onOpenCommandMenu={() => setCmdOpen(true)}
+                        />
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="console"
+                        initial={{ opacity: 0, scale: 0.96 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.96 }}
+                        transition={{ duration: 0.25 }}
+                      >
+                        <HeroConsole />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </Reveal>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Seamless Kinetic Telemetry Flow (replaces static lines) */}
-      <div className="relative py-6 overflow-hidden">
+      {/* Seamless Kinetic Telemetry Bridge (replaces static lines & black gaps) */}
+      <div className="relative py-6 overflow-hidden border-y border-white/[0.05] bg-gradient-to-r from-transparent via-[#00ffd1]/[0.03] to-transparent">
         <MarqueeTicker />
       </div>
 
