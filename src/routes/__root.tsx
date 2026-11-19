@@ -1,3 +1,4 @@
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -8,6 +9,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { Toaster } from "sonner";
 
 import appCss from "../styles.css?url";
 
@@ -97,6 +99,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       {
+        rel: "preconnect",
+        href: "https://fonts.googleapis.com",
+      },
+      {
+        rel: "preconnect",
+        href: "https://fonts.gstatic.com",
+        crossOrigin: "anonymous",
+      },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=Syne:wght@500;600;700;800&display=swap",
+      },
+      {
         rel: "stylesheet",
         href: appCss,
       },
@@ -119,27 +134,46 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <head>
         <HeadContent />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=Syne:wght@500;600;700;800&display=swap"
+        />
         <link rel="icon" href="/logo.jpg?v=2" type="image/jpeg" />
         <link rel="shortcut icon" href="/logo.jpg?v=2" type="image/jpeg" />
         <link rel="apple-touch-icon" href="/logo.jpg?v=2" />
       </head>
-      <body>
+      <body className="bg-background text-foreground antialiased selection:bg-[#00ffd1]/25 selection:text-[#00ffd1]">
         <div
           id="boot-screen"
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-background"
+          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#07090e] transition-opacity duration-300"
         >
-          <div className="flex flex-col items-center gap-4 px-6 text-center">
-            <div className="h-12 w-12 rounded-full border border-primary/30 border-t-primary animate-spin" />
+          <div className="relative flex flex-col items-center gap-5 px-6 text-center">
+            {/* Ambient glow */}
+            <div className="absolute -inset-10 rounded-full bg-[#00ffd1]/10 blur-3xl pointer-events-none" />
+            
+            {/* Logo / Monogram */}
+            <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl border border-[#00ffd1]/30 bg-[#0d121c] shadow-[0_0_30px_rgba(0,255,209,0.2)]">
+              <span className="font-display text-2xl font-black tracking-wider text-white">
+                DT<span className="text-[#00ffd1]">.</span>
+              </span>
+              <div className="absolute -inset-1 animate-spin rounded-2xl border border-transparent border-t-[#00ffd1]/60" />
+            </div>
+
             <div>
-              <p className="font-display text-xl font-semibold tracking-tight text-foreground">
-                Loading Dagim Tadesse
+              <p className="font-display text-lg font-bold tracking-tight text-white">
+                Dagim Tadesse
               </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Preparing the portfolio experience...
-              </p>
+              <div className="mt-1 flex items-center justify-center gap-2">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#00ffd1]" />
+                <span className="font-mono text-xs uppercase tracking-widest text-[#00ffd1]/80">
+                  Initializing Portfolio Core
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -159,10 +193,10 @@ function RootComponent() {
       if (bootScreen) {
         bootScreen.style.opacity = "0";
         bootScreen.style.pointerEvents = "none";
-        bootScreen.style.transition = "opacity 220ms ease";
+        bootScreen.style.transition = "opacity 240ms ease";
         window.setTimeout(() => {
           bootScreen.remove();
-        }, 220);
+        }, 240);
       }
     };
 
@@ -180,6 +214,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <Toaster theme="dark" position="bottom-right" richColors />
       <Outlet />
     </QueryClientProvider>
   );

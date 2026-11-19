@@ -1,0 +1,369 @@
+import React, { useEffect, useRef } from "react";
+
+interface Particle {
+  x: number;
+  y: number;
+  z: number;
+  vx: number;
+  vy: number;
+  vz: number;
+  radius: number;
+  color: string;
+  baseAlpha: number;
+  pulseSpeed: number;
+  pulsePhase: number;
+}
+
+interface TrailPoint {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  alpha: number;
+  radius: number;
+  color: string;
+}
+
+export function NeuralBackground() {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animationFrameId: number;
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+
+    // Mouse tracking with elastic physics
+    const mouse = {
+      x: width / 2,
+      y: height / 2,
+      prevX: width / 2,
+      prevY: height / 2,
+      targetX: width / 2,
+      targetY: height / 2,
+      speed: 0,
+      isActive: false,
+      pulse: 0,
+    };
+
+    const handleResize = () => {
+      if (!canvas) return;
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    };
+    window.addEventListener("resize", handleResize);
+
+    const mouseTrail: TrailPoint[] = [];
+
+    const handleMouseMove = (e: MouseEvent) => {
+      mouse.targetX = e.clientX;
+      mouse.targetY = e.clientY;
+      mouse.isActive = true;
+
+      const dx = mouse.targetX - mouse.prevX;
+      const dy = mouse.targetY - mouse.prevY;
+      mouse.speed = Math.sqrt(dx * dx + dy * dy);
+      mouse.prevX = mouse.targetX;
+      mouse.prevY = mouse.targetY;
+
+      // Spawn bright trailing stardust micro-particles on mouse movement
+      if (mouse.speed > 3 && mouseTrail.length < 25) {
+        mouseTrail.push({
+          x: e.clientX + (Math.random() - 0.5) * 16,
+          y: e.clientY + (Math.random() - 0.5) * 16,
+          vx: (Math.random() - 0.5) * 1.5,
+          vy: (Math.random() - 0.5) * 1.5,
+          alpha: 0.85,
+          radius: Math.random() * 2 + 1,
+          color: Math.random() > 0.4 ? "#00ffd1" : "#a855f7",
+        });
+      }
+    };
+
+    const handleMouseLeave = () => {
+      mouse.isActive = false;
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseleave", handleMouseLeave);
+
+    const COLORS = ["#00ffd1", "#38bdf8", "#8b5cf6", "#a855f7", "#34d399"];
+
+    // Initialize 3D particles with bold depth
+    const PARTICLE_COUNT = Math.min(105, Math.floor((width * height) / 12000));
+    const particles: Particle[] = [];
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      particles.push({
+        x: (Math.random() - 0.5) * width * 1.6,
+        y: (Math.random() - 0.5) * height * 1.6,
+        z: Math.random() * 750 + 80,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        vz: (Math.random() - 0.5) * 0.3,
+        radius: Math.random() * 2.2 + 1.2,
+        color: COLORS[Math.floor(Math.random() * COLORS.length)],
+        baseAlpha: Math.random() * 0.45 + 0.35,
+        pulseSpeed: Math.random() * 0.03 + 0.015,
+        pulsePhase: Math.random() * Math.PI * 2,
+      });
+    }
+
+    const FOCAL_LENGTH = 450;
+    let scrollY = window.scrollY;
+
+    const handleScroll = () => {
+      scrollY = window.scrollY;
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    let time = 0;
+
+    const render = () => {
+      time += 0.02;
+
+      // Smooth mouse interpolation
+      mouse.x += (mouse.targetX - mouse.x) * 0.12;
+      mouse.y += (mouse.targetY - mouse.y) * 0.12;
+      mouse.pulse = (Math.sin(time * 3) + 1) * 0.5; // Pulsing energy
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Deep ambient space illumination
+      const ambientGlow = ctx.createRadialGradient(
+        mouse.isActive ? mouse.x : width * 0.5,
+        mouse.isActive ? mouse.y : height * 0.3,
+        40,
+        width * 0.5,
+        height * 0.5,
+        width * 0.75,
+      );
+      ambientGlow.addColorStop(0, "rgba(0, 255, 209, 0.04)");
+      ambientGlow.addColorStop(0.35, "rgba(139, 92, 246, 0.025)");
+      ambientGlow.addColorStop(1, "rgba(7, 9, 14, 0)");
+      ctx.fillStyle = ambientGlow;
+      ctx.fillRect(0, 0, width, height);
+
+      // BOLD MOUSE ENERGY AURA: Concentric glowing energy ripples around cursor
+      if (mouse.isActive) {
+        // Outer pulsing ring
+        ctx.beginPath();
+        ctx.arc(mouse.x, mouse.y, 45 + mouse.pulse * 15, 0, Math.PI * 2);
+        ctx.strokeStyle = "rgba(0, 255, 209, 0.22)";
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+
+        // Inner core halo
+        ctx.beginPath();
+        ctx.arc(mouse.x, mouse.y, 16 + mouse.pulse * 6, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(0, 255, 209, 0.12)";
+        ctx.fill();
+
+        // Secondary violet aura
+        ctx.beginPath();
+        ctx.arc(mouse.x, mouse.y, 85 + mouse.pulse * 25, 0, Math.PI * 2);
+        ctx.strokeStyle = "rgba(168, 85, 247, 0.12)";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      // Update & render mouse trail particles
+      for (let i = mouseTrail.length - 1; i >= 0; i--) {
+        const tp = mouseTrail[i];
+        tp.x += tp.vx;
+        tp.y += tp.vy;
+        tp.alpha *= 0.92;
+        tp.radius *= 0.96;
+
+        if (tp.alpha < 0.05) {
+          mouseTrail.splice(i, 1);
+          continue;
+        }
+
+        ctx.beginPath();
+        ctx.arc(tp.x, tp.y, tp.radius, 0, Math.PI * 2);
+        ctx.fillStyle = tp.color;
+        ctx.globalAlpha = tp.alpha;
+        ctx.fill();
+      }
+
+      const projected: {
+        x: number;
+        y: number;
+        size: number;
+        p: Particle;
+        alpha: number;
+        distToMouse: number;
+      }[] = [];
+
+      // Update & project 3D particles
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+
+        // Orbit velocity
+        p.x += p.vx;
+        p.y += p.vy;
+        p.z += p.vz;
+        p.pulsePhase += p.pulseSpeed;
+
+        // Current 2D projected coordinate
+        const scale = FOCAL_LENGTH / p.z;
+        const projX = width / 2 + p.x * scale;
+        const projY = height / 2 + (p.y - scrollY * 0.12 * (1 - p.z / 850)) * scale;
+
+        const dx = mouse.x - projX;
+        const dy = mouse.y - projY;
+        const distToMouse = Math.sqrt(dx * dx + dy * dy);
+
+        // BOLD MOUSE GRAVITATION: Direct elastic attraction & vortex swirl
+        if (mouse.isActive && distToMouse < 280) {
+          const force = (280 - distToMouse) / 280;
+          // Magnetic pull toward cursor
+          p.vx += (dx / distToMouse) * force * 0.18;
+          p.vy += (dy / distToMouse) * force * 0.18;
+
+          // Gentle circular swirl around cursor
+          p.vx += (-dy / distToMouse) * force * 0.08;
+          p.vy += (dx / distToMouse) * force * 0.08;
+        }
+
+        // Dampen velocity to prevent runaway acceleration
+        p.vx *= 0.975;
+        p.vy *= 0.975;
+
+        // Wrap boundaries
+        const maxBound = width * 0.9;
+        if (p.x < -maxBound) p.x = maxBound;
+        if (p.x > maxBound) p.x = -maxBound;
+        if (p.y < -maxBound) p.y = maxBound;
+        if (p.y > maxBound) p.y = -maxBound;
+        if (p.z < 70) p.z = 820;
+        if (p.z > 820) p.z = 70;
+
+        const dynamicPulse = Math.sin(p.pulsePhase) * 0.2;
+        const depthAlpha = Math.min(
+          1,
+          Math.max(0.12, (1 - p.z / 850) * p.baseAlpha + dynamicPulse),
+        );
+        const size = p.radius * scale;
+
+        projected.push({
+          x: projX,
+          y: projY,
+          size,
+          p,
+          alpha: depthAlpha,
+          distToMouse,
+        });
+      }
+
+      // 1. BOLD INTERACTIVE LASER CONNECTIONS: Draw glowing lasers from mouse to closest particles
+      if (mouse.isActive) {
+        // Find particles within laser reach
+        const nearbyToMouse = projected
+          .filter((pt) => pt.distToMouse < 260)
+          .sort((a, b) => a.distToMouse - b.distToMouse)
+          .slice(0, 10); // Closest 10 particles
+
+        for (const pt of nearbyToMouse) {
+          const lineAlpha = (1 - pt.distToMouse / 260) * 0.75;
+          const laserGrad = ctx.createLinearGradient(mouse.x, mouse.y, pt.x, pt.y);
+          laserGrad.addColorStop(0, `rgba(0, 255, 209, ${lineAlpha})`);
+          laserGrad.addColorStop(0.6, `rgba(168, 85, 247, ${lineAlpha * 0.8})`);
+          laserGrad.addColorStop(1, `rgba(0, 255, 209, ${lineAlpha * 0.3})`);
+
+          ctx.strokeStyle = laserGrad;
+          ctx.lineWidth = 1.3;
+          ctx.beginPath();
+          ctx.moveTo(mouse.x, mouse.y);
+          ctx.lineTo(pt.x, pt.y);
+          ctx.stroke();
+
+          // Accent ring on connected particle
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, pt.size * 2.8, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(0, 255, 209, ${lineAlpha * 0.8})`;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+      }
+
+      // 2. CONSTELLATION WEB LINKS BETWEEN PARTICLES
+      ctx.lineWidth = 0.85;
+      for (let i = 0; i < projected.length; i++) {
+        for (let j = i + 1; j < projected.length; j++) {
+          const a = projected[i];
+          const b = projected[j];
+
+          const dx = a.x - b.x;
+          const dy = a.y - b.y;
+          const distSq = dx * dx + dy * dy;
+
+          const maxDist = 145;
+          if (distSq < maxDist * maxDist) {
+            const dist = Math.sqrt(distSq);
+            const lineAlpha = (1 - dist / maxDist) * Math.min(a.alpha, b.alpha) * 0.7;
+            ctx.strokeStyle = `rgba(0, 255, 209, ${lineAlpha})`;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // 3. DRAW GLOWING PARTICLE NODES
+      for (let i = 0; i < projected.length; i++) {
+        const { x, y, size, p, alpha, distToMouse } = projected[i];
+
+        if (x < -60 || x > width + 60 || y < -60 || y > height + 60) continue;
+
+        // If close to mouse, brighten and enlarge particle dynamically
+        const isNearMouse = mouse.isActive && distToMouse < 220;
+        const boost = isNearMouse ? (1 - distToMouse / 220) * 1.5 : 0;
+        const effectiveSize = Math.max(0.8, size * (1 + boost * 0.5));
+        const effectiveAlpha = Math.min(1, alpha + boost * 0.4);
+
+        // Radiant glow halo
+        ctx.beginPath();
+        ctx.arc(x, y, effectiveSize * 3, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = effectiveAlpha * 0.3;
+        ctx.fill();
+
+        // Intense core dot
+        ctx.beginPath();
+        ctx.arc(x, y, effectiveSize, 0, Math.PI * 2);
+        ctx.fillStyle = isNearMouse ? "#ffffff" : p.color;
+        ctx.globalAlpha = effectiveAlpha;
+        ctx.fill();
+      }
+
+      ctx.globalAlpha = 1.0;
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseleave", handleMouseLeave);
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-0 z-0 h-full w-full opacity-85 transition-opacity duration-700"
+    />
+  );
+}
