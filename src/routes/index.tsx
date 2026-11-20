@@ -58,6 +58,7 @@ import { TiltCard } from "@/components/portfolio/tilt-card";
 import { MarqueeTicker } from "@/components/portfolio/marquee-ticker";
 import { ProjectTheater } from "@/components/portfolio/project-theater";
 import { SkillsWorkbench } from "@/components/portfolio/skills-workbench";
+import { MilestoneSpine } from "@/components/portfolio/milestone-spine";
 
 export const Route = createFileRoute("/")({
   component: Portfolio,
@@ -721,10 +722,10 @@ function Portfolio() {
               title="Download Dagim's Curriculum Vitae (PDF)"
             >
               <FileDown size={13} />
-              <span>Download CV</span>
+              <span className="hidden sm:inline">Download </span>CV
             </a>
 
-            <div className="flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+            <div className="hidden md:flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
@@ -1148,128 +1149,9 @@ function Portfolio() {
         <div className="mx-auto max-w-5xl px-5 space-y-12">
           <SectionHeading kicker="04 // Career Journey" title="Experience & Proven Milestones" />
 
-          {/* Central Illuminated Chronological Spine */}
-          <div className="relative pl-6 sm:pl-10 space-y-12 before:absolute before:left-2 sm:before:left-3 before:top-3 before:bottom-3 before:w-[2px] before:bg-gradient-to-b before:from-[#00ffd1] before:via-purple-500 before:to-transparent">
-            
-            {/* MILESTONE 1: AFRICOM TECH LEAD */}
-            <div className="relative space-y-3">
-              {/* Glowing spine node */}
-              <div className="absolute -left-6 sm:-left-10 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-[#07090e] ring-2 ring-[#00ffd1]">
-                <span className="h-2 w-2 rounded-full bg-[#00ffd1] shadow-[0_0_10px_#00ffd1]" />
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
-                <span className="rounded-full bg-[#00ffd1]/15 px-3 py-0.5 font-bold text-[#00ffd1] border border-[#00ffd1]/30">
-                  Tech Lead · Internship
-                </span>
-                <span className="text-slate-400">Africom Tech</span>
-                <span className="text-slate-600">·</span>
-                <span className="text-slate-400">Addis Ababa, Ethiopia</span>
-              </div>
-
-              <h4 className="font-display text-2xl sm:text-3xl font-bold text-white">
-                Architect & Team Lead — Autonomous CRM Automation Agent
-              </h4>
-
-              <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-sans max-w-3xl">
-                Led technical architecture across a 3-engineer team. Built the core ASP.NET Clean Architecture backend, integrated Google Gemini for real-time lead score and emotional valence analysis, and independently developed an n8n webhook ingestion layer listening to LinkedIn, Twitter, Facebook, Instagram, and TikTok data.
-              </p>
-
-              <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-4 pt-2 max-w-3xl">
-                {[
-                  { label: "AI Lead Scoring", desc: "0-100 Gemini evaluation" },
-                  { label: "Clean Architecture", desc: "ASP.NET Core DDD layers" },
-                  { label: "Social Pipeline", desc: "5-platform n8n listeners" },
-                  { label: "Async Hangfire", desc: "Background job scheduling" },
-                ].map((item, i) => (
-                  <div key={i} className="border-l-2 border-[#00ffd1]/50 pl-3 py-1">
-                    <p className="font-mono text-xs font-semibold text-white">{item.label}</p>
-                    <p className="text-[11px] text-slate-400 mt-0.5">{item.desc}</p>
-                  </div>
-                ))}
-              </div>
-
-              <p className="text-xs italic text-slate-400 leading-relaxed max-w-3xl border-l border-white/20 pl-3 pt-1">
-                &quot;Led architecture decisions across a team of three as Tech Lead. Owned the core backend and independently built the entire n8n social monitoring layer mid-project. Overcame Gemini API header authentication discrepancies and kept the team focused to deliver a live demo within 4 weeks.&quot;
-              </p>
-            </div>
-
-            {/* MILESTONE 2: GDG HACKATHON WINNER */}
-            <div className="relative space-y-3 pt-4">
-              <div className="absolute -left-6 sm:-left-10 top-5 flex h-6 w-6 items-center justify-center rounded-full bg-[#07090e] ring-2 ring-amber-400">
-                <span className="h-2 w-2 rounded-full bg-amber-400 shadow-[0_0_10px_#fbbf24]" />
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
-                <span className="rounded-full bg-amber-400/15 px-3 py-0.5 font-bold text-amber-300 border border-amber-400/30 flex items-center gap-1.5">
-                  <Trophy size={12} /> GDG Hackathon Winner
-                </span>
-                <span className="text-slate-400">Google Developer Groups (GDG) · AASTU</span>
-              </div>
-
-              <h4 className="font-display text-2xl font-bold text-white">
-                GDG AASTU AI/ML Hackathon Winner — PriceGuard-AI
-              </h4>
-
-              <p className="text-sm text-slate-300 leading-relaxed font-sans max-w-3xl">
-                Engineered PriceGuard-AI under competition pressure with a live public deployment on Vercel. Analyzes product price histories across e-commerce retail endpoints using a regression ML model to output a definitive signal: buy now or wait for the optimal price drop window.
-              </p>
-
-              <div className="pt-1">
-                <a
-                  href="https://price-guard-ai.vercel.app/"
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider text-amber-300 transition-colors hover:text-white"
-                >
-                  <span>Launch PriceGuard-AI Live System</span>
-                  <ExternalLink size={12} />
-                </a>
-              </div>
-            </div>
-
-            {/* MILESTONE 3: CONDIGITAL ODOO CONTRACTOR */}
-            <div className="relative space-y-2 pt-4">
-              <div className="absolute -left-6 sm:-left-10 top-5 flex h-6 w-6 items-center justify-center rounded-full bg-[#07090e] ring-2 ring-[#38bdf8]">
-                <span className="h-2 w-2 rounded-full bg-[#38bdf8]" />
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
-                <span className="text-[#38bdf8] font-bold">Contractor · Current</span>
-                <span className="text-slate-600">·</span>
-                <span className="text-slate-400">ConDigital Inc. · Addis Ababa</span>
-              </div>
-
-              <h4 className="font-display text-xl font-bold text-white">
-                Odoo Designer — AI Training Datasets & Lead Funnels
-              </h4>
-
-              <p className="text-sm text-slate-400 leading-relaxed font-sans max-w-3xl">
-                Designing Odoo website content, structured forms, and data funnels for AI training datasets. Specializing in Website and CRM modules — applying SEO optimization, lead-generation tagging, and clean data categorization.
-              </p>
-            </div>
-
-            {/* MILESTONE 4: ACADEMIC DEGREE */}
-            <div className="relative space-y-2 pt-4">
-              <div className="absolute -left-6 sm:-left-10 top-5 flex h-6 w-6 items-center justify-center rounded-full bg-[#07090e] ring-2 ring-purple-400">
-                <span className="h-2 w-2 rounded-full bg-purple-400" />
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
-                <span className="text-purple-400 font-bold">Expected June 2027</span>
-                <span className="text-slate-600">·</span>
-                <span className="text-slate-400">Addis Ababa Science & Technology University</span>
-              </div>
-
-              <h4 className="font-display text-xl font-bold text-white">
-                Bachelor of Software Engineering (Self-Taught Since Jan 2022)
-              </h4>
-
-              <p className="text-sm text-slate-400 leading-relaxed font-sans max-w-3xl">
-                Rigorous foundational coursework in algorithms, operating systems, distributed architectures, and machine learning. Combined university curriculum with continuous personal shipping in production web and mobile software.
-              </p>
-            </div>
-
+          {/* Central Illuminated Chronological Spine with Interactive Parallax Kinetic Beam */}
+          <div className="pt-4">
+            <MilestoneSpine />
           </div>
         </div>
       </section>
