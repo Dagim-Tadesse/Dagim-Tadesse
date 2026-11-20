@@ -112,17 +112,17 @@ public class LeadIngestionService : ILeadIngestionService
   {
     id: "mobile",
     number: "03",
-    name: "Mobile & Modern UI/UX",
+    name: "Mobile, UI/UX & 3D Graphics",
     icon: Smartphone,
     accentColor: "#a855f7",
     summary:
-      "Flutter cross-platform apps built from scratch, React 19, TypeScript, and micro-interactions.",
+      "Flutter cross-platform apps from scratch, React 19, 3D Canvas perspective math, and spatial UI.",
     skills: [
       { name: "Flutter & Dart", level: "Advanced", note: "Gebeya Now marketplace built from scratch", highlight: true },
       { name: "React 19 & TypeScript", level: "Advanced", note: "Modern web apps, daily framework", highlight: true },
+      { name: "3D Graphics & Spatial Math", level: "Proficient", note: "6-DOF Matrix Cube & Canvas Shader Grids", highlight: true },
       { name: "Tailwind CSS & Animations", level: "Advanced", note: "Cyber aesthetics, glassmorphism" },
       { name: "Figma UI/UX Design", level: "Proficient", note: "Original mobile prototypes" },
-      { name: "TanStack Start & Router", level: "Proficient", note: "Full-stack SSR architecture" },
     ],
     codeFileName: "MarketplaceRepository.dart",
     codeLanguage: "dart",

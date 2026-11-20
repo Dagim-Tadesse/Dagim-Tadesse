@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { Sparkles, Eye, Compass, Activity } from "lucide-react";
 
 interface Particle {
   x: number;
@@ -24,8 +25,13 @@ interface TrailPoint {
   color: string;
 }
 
+type TerrainMode = "cyber" | "subtle" | "off";
+
 export function NeuralBackground() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [terrainMode, setTerrainMode] = useState<TerrainMode>("cyber");
+  const [fps, setFps] = useState<number>(60);
+  const [showHud, setShowHud] = useState<boolean>(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -71,7 +77,7 @@ export function NeuralBackground() {
       mouse.prevX = mouse.targetX;
       mouse.prevY = mouse.targetY;
 
-      // Spawn bright trailing stardust micro-particles on mouse movement
+      // Spawn trailing stardust micro-particles on mouse movement
       if (mouse.speed > 3 && mouseTrail.length < 25) {
         mouseTrail.push({
           x: e.clientX + (Math.random() - 0.5) * 16,
@@ -95,7 +101,7 @@ export function NeuralBackground() {
     const COLORS = ["#00ffd1", "#38bdf8", "#8b5cf6", "#a855f7", "#34d399"];
 
     // Initialize 3D particles with bold depth
-    const PARTICLE_COUNT = Math.min(105, Math.floor((width * height) / 12000));
+    const PARTICLE_COUNT = Math.min(95, Math.floor((width * height) / 13000));
     const particles: Particle[] = [];
 
     for (let i = 0; i < PARTICLE_COUNT; i++) {
@@ -103,9 +109,9 @@ export function NeuralBackground() {
         x: (Math.random() - 0.5) * width * 1.6,
         y: (Math.random() - 0.5) * height * 1.6,
         z: Math.random() * 750 + 80,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
-        vz: (Math.random() - 0.5) * 0.3,
+        vx: (Math.random() - 0.5) * 0.35,
+        vy: (Math.random() - 0.5) * 0.35,
+        vz: (Math.random() - 0.5) * 0.25,
         radius: Math.random() * 2.2 + 1.2,
         color: COLORS[Math.floor(Math.random() * COLORS.length)],
         baseAlpha: Math.random() * 0.45 + 0.35,
@@ -123,14 +129,29 @@ export function NeuralBackground() {
     window.addEventListener("scroll", handleScroll, { passive: true });
 
     let time = 0;
+    let lastFpsUpdate = performance.now();
+    let frameCount = 0;
 
-    const render = () => {
-      time += 0.02;
+    // 3D Terrain Grid Configuration
+    const GRID_COLS = 26; // Longitudinal lines
+    const GRID_ROWS = 18; // Latitudinal depth rings
+    const Z_NEAR = 90;
+    const Z_FAR = 780;
+
+    const render = (now: number) => {
+      time += 0.018;
+      frameCount++;
+
+      if (now - lastFpsUpdate >= 1000) {
+        setFps(Math.round((frameCount * 1000) / (now - lastFpsUpdate)));
+        frameCount = 0;
+        lastFpsUpdate = now;
+      }
 
       // Smooth mouse interpolation
       mouse.x += (mouse.targetX - mouse.x) * 0.12;
       mouse.y += (mouse.targetY - mouse.y) * 0.12;
-      mouse.pulse = (Math.sin(time * 3) + 1) * 0.5; // Pulsing energy
+      mouse.pulse = (Math.sin(time * 3) + 1) * 0.5;
 
       ctx.clearRect(0, 0, width, height);
 
@@ -149,7 +170,131 @@ export function NeuralBackground() {
       ctx.fillStyle = ambientGlow;
       ctx.fillRect(0, 0, width, height);
 
-      // BOLD MOUSE ENERGY AURA: Concentric glowing energy ripples around cursor
+      // =========================================================================
+      // LAYER 1: 3D UNDULATING PERSPECTIVE WIREFRAME GRID (CYBER HORIZON TERRAIN)
+      // =========================================================================
+      if (terrainMode !== "off") {
+        const horizonY = height * 0.58;
+        const groundOffset = 135;
+        const intensityMul = terrainMode === "cyber" ? 1.0 : 0.45;
+
+        // Compute vertex matrix [row][col] in 3D perspective space
+        const gridVertices: {
+          x: number;
+          y: number;
+          z: number;
+          elevation: number;
+          alpha: number;
+        }[][] = [];
+
+        const terrainWidth = width * 1.85;
+        const stepX = terrainWidth / (GRID_COLS - 1);
+
+        for (let r = 0; r < GRID_ROWS; r++) {
+          const rowVertices: {
+            x: number;
+            y: number;
+            z: number;
+            elevation: number;
+            alpha: number;
+          }[] = [];
+
+          // Non-linear depth distribution to stretch perspective toward horizon
+          const depthRatio = r / (GRID_ROWS - 1);
+          const z = Z_NEAR + Math.pow(depthRatio, 1.35) * (Z_FAR - Z_NEAR);
+          const scale = FOCAL_LENGTH / z;
+          const fogAlpha = Math.pow(1 - depthRatio, 1.45) * intensityMul;
+
+          for (let c = 0; c < GRID_COLS; c++) {
+            const worldX = -terrainWidth / 2 + c * stepX;
+
+            // Trigonometric dual-harmonic terrain elevation
+            const wave1 = Math.sin(worldX * 0.005 + time * 1.2) * Math.cos(z * 0.007 + time * 0.9) * 26;
+            const wave2 = Math.sin((worldX * 0.009 - z * 0.0075) + time * 1.6) * 14;
+            let elevation = wave1 + wave2;
+
+            // Mouse interactive surface ripple
+            const approxProjX = width / 2 + worldX * scale;
+            const approxProjY = horizonY + (groundOffset - scrollY * 0.07) * scale;
+            if (mouse.isActive) {
+              const dMouse = Math.hypot(approxProjX - mouse.x, approxProjY - mouse.y);
+              if (dMouse < 240) {
+                const influence = Math.pow(1 - dMouse / 240, 2);
+                elevation += Math.sin(time * 5.5 - dMouse * 0.065) * 34 * influence;
+              }
+            }
+
+            const projX = width / 2 + worldX * scale;
+            const projY = horizonY + (groundOffset + elevation - scrollY * 0.07 * (1 - depthRatio * 0.45)) * scale;
+
+            rowVertices.push({
+              x: projX,
+              y: projY,
+              z,
+              elevation,
+              alpha: Math.max(0, Math.min(1, fogAlpha * 0.38)),
+            });
+          }
+          gridVertices.push(rowVertices);
+        }
+
+        // Draw longitudinal perspective lines (connecting foreground to horizon)
+        ctx.lineWidth = 0.9;
+        for (let c = 0; c < GRID_COLS; c++) {
+          ctx.beginPath();
+          for (let r = 0; r < GRID_ROWS; r++) {
+            const v = gridVertices[r][c];
+            if (r === 0) ctx.moveTo(v.x, v.y);
+            else ctx.lineTo(v.x, v.y);
+          }
+          const startV = gridVertices[0][c];
+          const endV = gridVertices[GRID_ROWS - 1][c];
+          const grad = ctx.createLinearGradient(startV.x, startV.y, endV.x, endV.y);
+          grad.addColorStop(0, `rgba(0, 255, 209, ${0.45 * intensityMul})`);
+          grad.addColorStop(0.5, `rgba(56, 189, 248, ${0.22 * intensityMul})`);
+          grad.addColorStop(1, "rgba(139, 92, 246, 0)");
+          ctx.strokeStyle = grad;
+          ctx.stroke();
+        }
+
+        // Draw lateral contour rings
+        for (let r = 0; r < GRID_ROWS; r++) {
+          const row = gridVertices[r];
+          const alpha = row[0].alpha;
+          if (alpha < 0.015) continue;
+
+          ctx.beginPath();
+          for (let c = 0; c < GRID_COLS; c++) {
+            const v = row[c];
+            if (c === 0) ctx.moveTo(v.x, v.y);
+            else ctx.lineTo(v.x, v.y);
+          }
+          ctx.strokeStyle = `rgba(0, 255, 209, ${alpha})`;
+          ctx.lineWidth = 0.75;
+          ctx.stroke();
+        }
+
+        // Draw luminous vertex beacons on crests
+        if (terrainMode === "cyber") {
+          for (let r = 0; r < GRID_ROWS - 3; r += 2) {
+            for (let c = 0; c < GRID_COLS; c += 2) {
+              const v = gridVertices[r][c];
+              if (v.elevation > 12 && v.alpha > 0.08) {
+                ctx.beginPath();
+                ctx.arc(v.x, v.y, 1.4, 0, Math.PI * 2);
+                ctx.fillStyle = "#00ffd1";
+                ctx.globalAlpha = v.alpha * 1.6;
+                ctx.fill();
+              }
+            }
+          }
+          ctx.globalAlpha = 1.0;
+        }
+      }
+
+      // =========================================================================
+      // LAYER 2: MOUSE ENERGY AURA & CONCENTRIC PULSES
+      // =========================================================================
       if (mouse.isActive) {
         // Outer pulsing ring
         ctx.beginPath();
@@ -192,6 +337,9 @@ export function NeuralBackground() {
         ctx.fill();
       }
 
+      // =========================================================================
+      // LAYER 3: 3D FLOATING PARTICLES & CONSTELLATION WEB
+      // =========================================================================
       const projected: {
         x: number;
         y: number;
@@ -201,7 +349,6 @@ export function NeuralBackground() {
         distToMouse: number;
       }[] = [];
 
-      // Update & project 3D particles
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
 
@@ -220,14 +367,11 @@ export function NeuralBackground() {
         const dy = mouse.y - projY;
         const distToMouse = Math.sqrt(dx * dx + dy * dy);
 
-        // BOLD MOUSE GRAVITATION: Direct elastic attraction & vortex swirl
+        // BOLD MOUSE GRAVITATION: Elastic attraction & vortex swirl
         if (mouse.isActive && distToMouse < 280) {
           const force = (280 - distToMouse) / 280;
-          // Magnetic pull toward cursor
           p.vx += (dx / distToMouse) * force * 0.18;
           p.vy += (dy / distToMouse) * force * 0.18;
-
-          // Gentle circular swirl around cursor
           p.vx += (-dy / distToMouse) * force * 0.08;
           p.vy += (dx / distToMouse) * force * 0.08;
         }
@@ -262,13 +406,12 @@ export function NeuralBackground() {
         });
       }
 
-      // 1. BOLD INTERACTIVE LASER CONNECTIONS: Draw glowing lasers from mouse to closest particles
+      // LASER CONNECTIONS FROM MOUSE TO CLOSEST PARTICLES
       if (mouse.isActive) {
-        // Find particles within laser reach
         const nearbyToMouse = projected
           .filter((pt) => pt.distToMouse < 260)
           .sort((a, b) => a.distToMouse - b.distToMouse)
-          .slice(0, 10); // Closest 10 particles
+          .slice(0, 10);
 
         for (const pt of nearbyToMouse) {
           const lineAlpha = (1 - pt.distToMouse / 260) * 0.75;
@@ -284,7 +427,6 @@ export function NeuralBackground() {
           ctx.lineTo(pt.x, pt.y);
           ctx.stroke();
 
-          // Accent ring on connected particle
           ctx.beginPath();
           ctx.arc(pt.x, pt.y, pt.size * 2.8, 0, Math.PI * 2);
           ctx.strokeStyle = `rgba(0, 255, 209, ${lineAlpha * 0.8})`;
@@ -293,7 +435,7 @@ export function NeuralBackground() {
         }
       }
 
-      // 2. CONSTELLATION WEB LINKS BETWEEN PARTICLES
+      // CONSTELLATION WEB LINKS BETWEEN PARTICLES
       ctx.lineWidth = 0.85;
       for (let i = 0; i < projected.length; i++) {
         for (let j = i + 1; j < projected.length; j++) {
@@ -317,13 +459,12 @@ export function NeuralBackground() {
         }
       }
 
-      // 3. DRAW GLOWING PARTICLE NODES
+      // DRAW GLOWING PARTICLE NODES
       for (let i = 0; i < projected.length; i++) {
         const { x, y, size, p, alpha, distToMouse } = projected[i];
 
         if (x < -60 || x > width + 60 || y < -60 || y > height + 60) continue;
 
-        // If close to mouse, brighten and enlarge particle dynamically
         const isNearMouse = mouse.isActive && distToMouse < 220;
         const boost = isNearMouse ? (1 - distToMouse / 220) * 1.5 : 0;
         const effectiveSize = Math.max(0.8, size * (1 + boost * 0.5));
@@ -348,7 +489,7 @@ export function NeuralBackground() {
       animationFrameId = requestAnimationFrame(render);
     };
 
-    render();
+    animationFrameId = requestAnimationFrame(render);
 
     return () => {
       cancelAnimationFrame(animationFrameId);
@@ -357,13 +498,99 @@ export function NeuralBackground() {
       document.removeEventListener("mouseleave", handleMouseLeave);
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [terrainMode]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-0 h-full w-full opacity-85 transition-opacity duration-700"
-    />
+    <>
+      <canvas
+        ref={canvasRef}
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-0 h-full w-full opacity-90 transition-opacity duration-700"
+      />
+
+      {/* FLOATING REAL-TIME GRAPHICS ENGINE TELEMETRY DOCK */}
+      <div className="fixed bottom-4 right-4 z-40 hidden sm:flex flex-col items-end gap-1.5 pointer-events-auto select-none">
+        {showHud && (
+          <div className="rounded-xl border border-white/10 bg-[#07090e]/90 backdrop-blur-xl p-3 shadow-2xl space-y-2 text-xs font-mono text-slate-300 w-64 animate-in fade-in slide-in-from-bottom-2">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-1.5">
+              <span className="font-bold text-white flex items-center gap-1.5">
+                <Compass size={13} className="text-[#00ffd1]" />
+                3D Graphics Pipeline
+              </span>
+              <span className="text-[10px] text-emerald-400 font-semibold">{fps} FPS</span>
+            </div>
+
+            <div className="space-y-1 text-[11px] text-slate-400">
+              <div className="flex justify-between">
+                <span>Projection:</span>
+                <span className="text-white">Perspective 3D</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Terrain Mesh:</span>
+                <span className="text-[#00ffd1]">468 Active Vertices</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Shader Logic:</span>
+                <span className="text-purple-400">Trig Displacement</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Mouse Deflection:</span>
+                <span className="text-emerald-400">Interactive Wave</span>
+              </div>
+            </div>
+
+            {/* Mode Selector */}
+            <div className="pt-1.5 border-t border-white/[0.08] flex items-center justify-between gap-1">
+              <span className="text-[10px] uppercase tracking-wider text-slate-400">Mode:</span>
+              <div className="flex items-center gap-1 bg-black/40 p-0.5 rounded-lg border border-white/5">
+                <button
+                  onClick={() => setTerrainMode("cyber")}
+                  className={`px-2 py-0.5 rounded text-[10px] transition-colors ${
+                    terrainMode === "cyber"
+                      ? "bg-[#00ffd1]/20 text-[#00ffd1] font-bold"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  Cyber
+                </button>
+                <button
+                  onClick={() => setTerrainMode("subtle")}
+                  className={`px-2 py-0.5 rounded text-[10px] transition-colors ${
+                    terrainMode === "subtle"
+                      ? "bg-[#00ffd1]/20 text-[#00ffd1] font-bold"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  Subtle
+                </button>
+                <button
+                  onClick={() => setTerrainMode("off")}
+                  className={`px-2 py-0.5 rounded text-[10px] transition-colors ${
+                    terrainMode === "off"
+                      ? "bg-red-500/20 text-red-400 font-bold"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  Off
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Minimalist Toggle Pill */}
+        <button
+          onClick={() => setShowHud(!showHud)}
+          className="flex items-center gap-2 rounded-full border border-white/10 bg-[#07090e]/80 backdrop-blur-md px-3 py-1 text-[11px] font-mono text-slate-400 hover:text-white hover:border-[#00ffd1]/40 transition-all shadow-lg"
+          title="Toggle 3D Graphics Engine Telemetry"
+        >
+          <span className="h-1.5 w-1.5 rounded-full bg-[#00ffd1] animate-pulse" />
+          <span>3D Graphics</span>
+          <span className="text-[10px] text-slate-500 bg-white/5 px-1.5 py-0.2 rounded border border-white/5">
+            {fps} FPS
+          </span>
+        </button>
+      </div>
+    </>
   );
 }
