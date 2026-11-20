@@ -17,6 +17,7 @@ import {
   Code2,
   Users,
 } from "lucide-react";
+import { sfx } from "@/lib/sound-effects";
 
 interface InteractiveCubeProps {
   onNavigate: (sectionId: string) => void;
@@ -189,6 +190,11 @@ export function InteractiveCube({ onNavigate, onOpenCommandMenu }: InteractiveCu
     const newRotY = dragStartRef.current.rotY + dx * sensitivity;
     const newRotX = Math.max(-88, Math.min(88, dragStartRef.current.rotX - dy * sensitivity));
 
+    // Subtle audio tick on rotation milestones
+    if (Math.floor(dragDistanceRef.current / 40) > Math.floor((dragDistanceRef.current - Math.hypot(e.movementX, e.movementY)) / 40)) {
+      sfx.playTick(1.1);
+    }
+
     setRotation({ x: newRotX, y: newRotY });
   };
 
@@ -197,6 +203,7 @@ export function InteractiveCube({ onNavigate, onOpenCommandMenu }: InteractiveCu
   };
 
   const snapToFace = (face: FaceConfig) => {
+    sfx.playSnap();
     setAutoRotate(false);
     setActiveFace(face.key);
     setHasInteracted(true);
@@ -210,6 +217,7 @@ export function InteractiveCube({ onNavigate, onOpenCommandMenu }: InteractiveCu
     }
     setActiveFace(face.key);
     if (face.isCV) {
+      sfx.playSuccess();
       const link = document.createElement("a");
       link.href = "/Dagim_Tadesse_CV.pdf";
       link.download = "Dagim_Tadesse_CV.pdf";
@@ -217,6 +225,7 @@ export function InteractiveCube({ onNavigate, onOpenCommandMenu }: InteractiveCu
       link.rel = "noreferrer noopener";
       link.click();
     } else {
+      sfx.playSnap();
       onNavigate(face.sectionId);
     }
   };

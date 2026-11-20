@@ -39,9 +39,12 @@ import {
   Zap,
   FileDown,
   Box,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import { sfx } from "@/lib/sound-effects";
 
 import { HeroConsole } from "@/components/portfolio/hero-console";
 import { CommandMenu } from "@/components/portfolio/command-menu";
@@ -554,6 +557,7 @@ function Portfolio() {
   const [showTop, setShowTop] = useState(false);
   const [cmdOpen, setCmdOpen] = useState(false);
   const [heroVisual, setHeroVisual] = useState<"cube" | "console">("cube");
+  const [muted, setMuted] = useState(sfx.isMuted());
   const [tab, setTab] = useState<TabId>("top");
   const [skillSearch, setSkillSearch] = useState("");
   const { scrollYProgress } = useScroll();
@@ -564,12 +568,17 @@ function Portfolio() {
   });
 
   useEffect(() => {
+    return sfx.subscribe(setMuted);
+  }, []);
+
+  useEffect(() => {
     const onScroll = () => setShowTop(window.scrollY > 500);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const copyEmail = () => {
+    sfx.playSuccess();
     navigator.clipboard.writeText("dagimtadesse25@gmail.com");
     toast.success("Email copied to clipboard!", {
       description: "dagimtadesse25@gmail.com",
@@ -577,6 +586,7 @@ function Portfolio() {
   };
 
   const scrollTo = (id: string) => {
+    sfx.playTick(1.2);
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
@@ -655,9 +665,41 @@ function Portfolio() {
           </ul>
 
           {/* Quick Action Pill & Search */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            {/* AUDIO SFX TOGGLE */}
             <button
-              onClick={() => setCmdOpen(true)}
+              onClick={() => {
+                const nowMuted = sfx.toggle();
+                toast(nowMuted ? "Audio muted" : "Audio enabled", {
+                  description: nowMuted ? "Synthesized UI sound effects disabled" : "Subtle cyber UI audio enabled",
+                });
+              }}
+              className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-xs font-mono transition-all ${
+                !muted
+                  ? "border-[#00ffd1]/40 bg-[#00ffd1]/10 text-[#00ffd1] shadow-[0_0_12px_rgba(0,255,209,0.2)]"
+                  : "border-white/10 bg-white/5 text-slate-400 hover:text-white hover:border-white/20"
+              }`}
+              title={muted ? "Enable futuristic UI sound effects" : "Mute UI sound effects"}
+              aria-label="Toggle audio effects"
+            >
+              {!muted ? (
+                <>
+                  <Volume2 size={13} className="text-[#00ffd1] animate-pulse" />
+                  <span className="hidden xl:inline text-[10px] font-bold">SFX ON</span>
+                </>
+              ) : (
+                <>
+                  <VolumeX size={13} />
+                  <span className="hidden xl:inline text-[10px]">SFX OFF</span>
+                </>
+              )}
+            </button>
+
+            <button
+              onClick={() => {
+                sfx.playSnap();
+                setCmdOpen(true);
+              }}
               className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-mono text-slate-300 transition-colors hover:border-[#00ffd1]/40 hover:text-white"
               title="Press ⌘K or / to open command menu"
             >
@@ -674,6 +716,7 @@ function Portfolio() {
               download="Dagim_Tadesse_CV.pdf"
               target="_blank"
               rel="noreferrer noopener"
+              onClick={() => sfx.playSuccess()}
               className="flex items-center gap-1.5 rounded-full border border-[#00ffd1]/30 bg-[#00ffd1]/10 px-3.5 py-1.5 font-mono text-xs font-bold text-[#00ffd1] transition-all hover:border-[#00ffd1] hover:bg-[#00ffd1]/20 hover:scale-105 shadow-[0_0_15px_rgba(0,255,209,0.15)]"
               title="Download Dagim's Curriculum Vitae (PDF)"
             >
@@ -787,6 +830,7 @@ function Portfolio() {
                     download="Dagim_Tadesse_CV.pdf"
                     target="_blank"
                     rel="noreferrer noopener"
+                    onClick={() => sfx.playSuccess()}
                     className="group inline-flex items-center gap-2 rounded-full border border-[#00ffd1]/40 bg-[#00ffd1]/10 px-5 py-3 font-mono text-xs font-semibold uppercase tracking-wider text-[#00ffd1] transition-all hover:bg-[#00ffd1]/20 hover:border-[#00ffd1] hover:scale-105 shadow-[0_0_20px_rgba(0,255,209,0.15)]"
                     title="Download Curriculum Vitae (PDF)"
                   >
@@ -795,7 +839,10 @@ function Portfolio() {
                   </a>
 
                   <button
-                    onClick={() => setCmdOpen(true)}
+                    onClick={() => {
+                      sfx.playSnap();
+                      setCmdOpen(true);
+                    }}
                     className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-3 font-mono text-xs font-semibold uppercase tracking-wider text-slate-200 transition-colors hover:border-[#00ffd1]/50 hover:bg-white/10"
                   >
                     <Terminal size={14} className="text-[#00ffd1]" />
@@ -837,7 +884,10 @@ function Portfolio() {
                 <div className="flex items-center justify-between pb-1 px-1">
                   <div className="inline-flex rounded-xl border border-white/10 bg-black/40 p-1 backdrop-blur-md">
                     <button
-                      onClick={() => setHeroVisual("cube")}
+                      onClick={() => {
+                        sfx.playSwitch();
+                        setHeroVisual("cube");
+                      }}
                       className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-mono text-xs font-semibold transition-all ${
                         heroVisual === "cube"
                           ? "bg-[#00ffd1]/20 text-[#00ffd1] border border-[#00ffd1]/40 shadow-[0_0_15px_rgba(0,255,209,0.2)]"
@@ -848,7 +898,10 @@ function Portfolio() {
                       <span>3D Matrix Cube</span>
                     </button>
                     <button
-                      onClick={() => setHeroVisual("console")}
+                      onClick={() => {
+                        sfx.playSwitch();
+                        setHeroVisual("console");
+                      }}
                       className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-mono text-xs font-semibold transition-all ${
                         heroVisual === "console"
                           ? "bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-[0_0_15px_rgba(168,85,247,0.2)]"

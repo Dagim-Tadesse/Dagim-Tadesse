@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { graphicsStore, WireColor, GraphicsConfig } from "@/lib/graphics-store";
+import { sfx } from "@/lib/sound-effects";
 
 interface SkillPillar {
   id: string;
@@ -253,16 +254,19 @@ export function SkillsWorkbench() {
   }, []);
 
   const updateConfig = (partial: Partial<GraphicsConfig>) => {
+    sfx.playTick(1.1);
     graphicsStore.set(partial);
     setGConfig(graphicsStore.get());
   };
 
   const triggerPulse = () => {
+    sfx.playSeismic();
     graphicsStore.triggerShockwave();
     toast.success("⚡ Seismic shockwave dispatched across 3D terrain grid!");
   };
 
   const resetConfig = () => {
+    sfx.playSwitch();
     graphicsStore.reset();
     setGConfig(graphicsStore.get());
     toast.info("Graphics sandbox reset to default parameters");
@@ -272,11 +276,13 @@ export function SkillsWorkbench() {
   const pillar = PILLARS[activeIndex] || PILLARS[0];
 
   const selectTab = (id: string, index: number) => {
+    sfx.playSwitch();
     setDirection(index > activeIndex ? 1 : -1);
     setActiveTab(id);
   };
 
   const copyCode = () => {
+    sfx.playSuccess();
     navigator.clipboard.writeText(pillar.codeSnippet);
     setCopied(true);
     toast.success("Architectural code blueprint copied!");
