@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Sparkles, Eye, Compass, Activity } from "lucide-react";
+import { graphicsStore, WireColor } from "@/lib/graphics-store";
 
 interface Particle {
   x: number;
@@ -139,7 +140,8 @@ export function NeuralBackground() {
     const Z_FAR = 760;
 
     const render = (now: number) => {
-      time += 0.018;
+      const gCfg = graphicsStore.get();
+      time += 0.014 * gCfg.waveSpeed;
       frameCount++;
 
       if (now - lastFpsUpdate >= 1000) {
@@ -178,13 +180,46 @@ export function NeuralBackground() {
         const groundOffset = 140;
         const intensityMul = terrainMode === "cyber" ? 1.0 : 0.5;
 
+        // Dynamic theme color palette
+        const palette = {
+          cyan: {
+            p1: "rgba(0, 255, 209,",
+            p2: "rgba(56, 189, 248,",
+            p3: "rgba(168, 85, 247,",
+            dot: "#00ffd1",
+          },
+          violet: {
+            p1: "rgba(168, 85, 247,",
+            p2: "rgba(236, 72, 153,",
+            p3: "rgba(59, 130, 246,",
+            dot: "#ec4899",
+          },
+          emerald: {
+            p1: "rgba(16, 185, 129,",
+            p2: "rgba(0, 255, 209,",
+            p3: "rgba(14, 165, 233,",
+            dot: "#10b981",
+          },
+          amber: {
+            p1: "rgba(245, 158, 11,",
+            p2: "rgba(251, 191, 36,",
+            p3: "rgba(239, 68, 68,",
+            dot: "#fbbf24",
+          },
+        }[gCfg.wireColor] || {
+          p1: "rgba(0, 255, 209,",
+          p2: "rgba(56, 189, 248,",
+          p3: "rgba(168, 85, 247,",
+          dot: "#00ffd1",
+        };
+
         // 1. HORIZON CORE ATMOSPHERE & GLOWING HORIZON LINE
         const horizonGrad = ctx.createLinearGradient(0, horizonY, width, horizonY);
-        horizonGrad.addColorStop(0, "rgba(0, 255, 209, 0)");
-        horizonGrad.addColorStop(0.2, `rgba(0, 255, 209, ${0.45 * intensityMul})`);
-        horizonGrad.addColorStop(0.5, `rgba(0, 255, 209, ${0.85 * intensityMul})`);
-        horizonGrad.addColorStop(0.8, `rgba(168, 85, 247, ${0.45 * intensityMul})`);
-        horizonGrad.addColorStop(1, "rgba(168, 85, 247, 0)");
+        horizonGrad.addColorStop(0, `${palette.p1} 0)`);
+        horizonGrad.addColorStop(0.2, `${palette.p1} ${0.45 * intensityMul})`);
+        horizonGrad.addColorStop(0.5, `${palette.p1} ${0.85 * intensityMul})`);
+        horizonGrad.addColorStop(0.8, `${palette.p3} ${0.45 * intensityMul})`);
+        horizonGrad.addColorStop(1, `${palette.p3} 0)`);
 
         ctx.beginPath();
         ctx.moveTo(0, horizonY);
@@ -195,8 +230,8 @@ export function NeuralBackground() {
 
         // Soft ambient horizon sun arc
         const sunGrad = ctx.createRadialGradient(width * 0.5, horizonY, 5, width * 0.5, horizonY, 220);
-        sunGrad.addColorStop(0, `rgba(0, 255, 209, ${0.18 * intensityMul})`);
-        sunGrad.addColorStop(0.4, `rgba(139, 92, 246, ${0.1 * intensityMul})`);
+        sunGrad.addColorStop(0, `${palette.p1} ${0.18 * intensityMul})`);
+        sunGrad.addColorStop(0.4, `${palette.p3} ${0.1 * intensityMul})`);
         sunGrad.addColorStop(1, "rgba(7, 9, 14, 0)");
         ctx.fillStyle = sunGrad;
         ctx.beginPath();
@@ -214,6 +249,12 @@ export function NeuralBackground() {
 
         const terrainWidth = width * 1.95;
         const stepX = terrainWidth / (GRID_COLS - 1);
+        const focal = gCfg.focalLength;
+
+        // Seismic shockwave computation
+        const shockActive = gCfg.shockwave > 0 && now - gCfg.shockwave < 3200;
+        const shockAge = shockActive ? (now - gCfg.shockwave) / 1000 : 0;
+        const shockRadius = shockAge * 600;
 
         for (let r = 0; r < GRID_ROWS; r++) {
           const rowVertices: {
@@ -226,16 +267,27 @@ export function NeuralBackground() {
 
           const depthRatio = r / (GRID_ROWS - 1);
           const z = Z_NEAR + Math.pow(depthRatio, 1.3) * (Z_FAR - Z_NEAR);
-          const scale = FOCAL_LENGTH / z;
+          const scale = focal / z;
           const fogAlpha = Math.pow(1 - depthRatio, 1.25) * intensityMul;
 
           for (let c = 0; c < GRID_COLS; c++) {
             const worldX = -terrainWidth / 2 + c * stepX;
 
-            // Dual harmonic wave elevation function
-            const wave1 = Math.sin(worldX * 0.005 + time * 1.3) * Math.cos(z * 0.007 + time * 1.0) * 32;
-            const wave2 = Math.sin((worldX * 0.009 - z * 0.008) + time * 1.7) * 16;
+            // Dual harmonic wave elevation function scaled by live amplitude
+            const wave1 = Math.sin(worldX * 0.005 + time * 1.3) * Math.cos(z * 0.007 + time * 1.0) * gCfg.amplitude;
+            const wave2 = Math.sin((worldX * 0.009 - z * 0.008) + time * 1.7) * (gCfg.amplitude * 0.5);
             let elevation = wave1 + wave2;
+
+            // Live Seismic Shockwave pulse effect
+            if (shockActive) {
+              const dOrigin = Math.hypot(worldX, z - Z_NEAR);
+              const waveDiff = Math.abs(dOrigin - shockRadius);
+              if (waveDiff < 160) {
+                const shockDecay = Math.max(0, 1 - shockAge / 3.2);
+                const shockAmp = Math.cos((waveDiff / 160) * Math.PI) * 48 * shockDecay;
+                elevation += shockAmp;
+              }
+            }
 
             // Interactive mouse deflection ripple
             const approxProjX = width / 2 + worldX * scale;
@@ -274,10 +326,10 @@ export function NeuralBackground() {
           const startV = gridVertices[0][c];
           const endV = gridVertices[GRID_ROWS - 1][c];
           const grad = ctx.createLinearGradient(startV.x, startV.y, endV.x, endV.y);
-          grad.addColorStop(0, `rgba(0, 255, 209, ${0.72 * intensityMul})`);
-          grad.addColorStop(0.35, `rgba(56, 189, 248, ${0.45 * intensityMul})`);
-          grad.addColorStop(0.75, `rgba(168, 85, 247, ${0.2 * intensityMul})`);
-          grad.addColorStop(1, "rgba(139, 92, 246, 0)");
+          grad.addColorStop(0, `${palette.p1} ${0.72 * intensityMul})`);
+          grad.addColorStop(0.35, `${palette.p2} ${0.45 * intensityMul})`);
+          grad.addColorStop(0.75, `${palette.p3} ${0.2 * intensityMul})`);
+          grad.addColorStop(1, `${palette.p3} 0)`);
           ctx.strokeStyle = grad;
           ctx.stroke();
         }
@@ -294,7 +346,7 @@ export function NeuralBackground() {
             if (c === 0) ctx.moveTo(v.x, v.y);
             else ctx.lineTo(v.x, v.y);
           }
-          ctx.strokeStyle = `rgba(0, 255, 209, ${alpha})`;
+          ctx.strokeStyle = `${palette.p1} ${alpha})`;
           ctx.lineWidth = 0.85;
           ctx.stroke();
         }
@@ -316,10 +368,10 @@ export function NeuralBackground() {
                 ctx.globalAlpha = v.alpha * 1.5;
                 ctx.fill();
 
-                // Cyan halo ring
+                // Halo ring
                 ctx.beginPath();
                 ctx.arc(v.x, v.y, 3.5, 0, Math.PI * 2);
-                ctx.strokeStyle = "rgba(0, 255, 209, 0.4)";
+                ctx.strokeStyle = `${palette.p1} 0.4)`;
                 ctx.lineWidth = 0.6;
                 ctx.stroke();
               }

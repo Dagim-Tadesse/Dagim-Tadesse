@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Brain,
@@ -10,8 +10,14 @@ import {
   Check,
   ShieldCheck,
   ChevronRight,
+  Compass,
+  Sliders,
+  RotateCcw,
+  Activity,
+  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
+import { graphicsStore, WireColor, GraphicsConfig } from "@/lib/graphics-store";
 
 interface SkillPillar {
   id: string;
@@ -191,12 +197,76 @@ class ProductRepositoryImpl implements ProductRepository {
   ]
 }`,
   },
+  {
+    id: "graphics",
+    number: "05",
+    name: "3D Graphics & Shaders",
+    icon: Compass,
+    accentColor: "#00ffd1",
+    summary:
+      "Real-time 3D perspective projection, trigonometric elevation shaders, 6-DOF spatial matrix mechanics, and 60 FPS Canvas math.",
+    skills: [
+      { name: "3D Perspective Projection", level: "Advanced", note: "Non-linear focal scale: f / (f + z)", highlight: true },
+      { name: "Trigonometric Wave Shaders", level: "Advanced", note: "Dual-harmonic dynamic terrain displacement", highlight: true },
+      { name: "6-DOF Matrix Transforms", level: "Proficient", note: "Interactive CSS 3D & inertia physics", highlight: true },
+      { name: "Interactive Wave Deflection", level: "Advanced", note: "Radial wave impulse & elastic propagation", highlight: true },
+      { name: "Atmospheric Depth Fog", level: "Advanced", note: "Exponential chromatic alpha attenuation" },
+    ],
+    codeFileName: "PerspectiveTerrainShader.ts",
+    codeLanguage: "typescript",
+    codeSnippet: `// Real-Time 3D Perspective Projection & Elevation Shader
+export function computeTerrainVertex(
+  col: number, row: number, time: number, config: GraphicsConfig
+): ProjectedVertex {
+  // 1. Calculate world coordinates with non-linear camera perspective
+  const depthRatio = row / (GRID_ROWS - 1);
+  const z = Z_NEAR + Math.pow(depthRatio, 1.3) * (Z_FAR - Z_NEAR);
+  const scale = config.focalLength / z;
+  const worldX = -TERRAIN_WIDTH / 2 + col * STEP_X;
+
+  // 2. Dual-harmonic trigonometric wave synthesis (Shader displacement)
+  const wave1 = Math.sin(worldX * 0.005 + time * config.waveSpeed) * 
+                Math.cos(z * 0.007 + time * (config.waveSpeed * 0.77)) * config.amplitude;
+  const wave2 = Math.sin((worldX * 0.009 - z * 0.008) + time * 1.7) * (config.amplitude * 0.5);
+  const elevation = wave1 + wave2;
+
+  // 3. Project 3D coordinates to 2D screen viewport with depth fog
+  return {
+    screenX: VIEWPORT_WIDTH / 2 + worldX * scale,
+    screenY: HORIZON_Y + (BASE_GROUND + elevation) * scale,
+    fogAlpha: Math.pow(1 - depthRatio, 1.25) // Exponential depth attenuation
+  };
+}`,
+  },
 ];
 
 export function SkillsWorkbench() {
   const [activeTab, setActiveTab] = useState<string>("ai");
   const [direction, setDirection] = useState(1);
   const [copied, setCopied] = useState(false);
+  const [gConfig, setGConfig] = useState<GraphicsConfig>(graphicsStore.get());
+
+  useEffect(() => {
+    return graphicsStore.subscribe((cfg) => {
+      setGConfig({ ...cfg });
+    });
+  }, []);
+
+  const updateConfig = (partial: Partial<GraphicsConfig>) => {
+    graphicsStore.set(partial);
+    setGConfig(graphicsStore.get());
+  };
+
+  const triggerPulse = () => {
+    graphicsStore.triggerShockwave();
+    toast.success("⚡ Seismic shockwave dispatched across 3D terrain grid!");
+  };
+
+  const resetConfig = () => {
+    graphicsStore.reset();
+    setGConfig(graphicsStore.get());
+    toast.info("Graphics sandbox reset to default parameters");
+  };
 
   const activeIndex = PILLARS.findIndex((p) => p.id === activeTab);
   const pillar = PILLARS[activeIndex] || PILLARS[0];
@@ -373,6 +443,118 @@ export function SkillsWorkbench() {
                     <code>{pillar.codeSnippet}</code>
                   </pre>
                 </div>
+
+                {/* Interactive Graphics Lab Controls when Pillar is 3D Graphics */}
+                {pillar.id === "graphics" && (
+                  <div className="p-4 border-t border-white/[0.08] bg-black/60 space-y-3.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Sliders size={13} className="text-[#00ffd1]" />
+                        <span className="font-mono text-xs font-bold text-white uppercase tracking-wider">
+                          Real-Time Graphics Playground
+                        </span>
+                      </div>
+                      <span className="font-mono text-[9px] text-emerald-400 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 flex items-center gap-1">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        Live Canvas Reactive
+                      </span>
+                    </div>
+
+                    {/* Sliders Grid */}
+                    <div className="grid sm:grid-cols-3 gap-2.5">
+                      {/* Wave Speed */}
+                      <div className="space-y-1 bg-white/[0.02] p-2.5 rounded-xl border border-white/[0.06]">
+                        <div className="flex justify-between font-mono text-[10px] text-slate-300">
+                          <span>Wave Speed</span>
+                          <span className="text-[#00ffd1] font-bold">{gConfig.waveSpeed.toFixed(1)}x</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0.4"
+                          max="2.8"
+                          step="0.1"
+                          value={gConfig.waveSpeed}
+                          onChange={(e) => updateConfig({ waveSpeed: parseFloat(e.target.value) })}
+                          className="w-full accent-[#00ffd1] cursor-pointer h-1.5 bg-white/10 rounded-lg appearance-none"
+                        />
+                      </div>
+
+                      {/* Amplitude */}
+                      <div className="space-y-1 bg-white/[0.02] p-2.5 rounded-xl border border-white/[0.06]">
+                        <div className="flex justify-between font-mono text-[10px] text-slate-300">
+                          <span>Wave Elevation</span>
+                          <span className="text-[#00ffd1] font-bold">{gConfig.amplitude}px</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="8"
+                          max="55"
+                          step="1"
+                          value={gConfig.amplitude}
+                          onChange={(e) => updateConfig({ amplitude: parseInt(e.target.value, 10) })}
+                          className="w-full accent-[#00ffd1] cursor-pointer h-1.5 bg-white/10 rounded-lg appearance-none"
+                        />
+                      </div>
+
+                      {/* Focal Depth */}
+                      <div className="space-y-1 bg-white/[0.02] p-2.5 rounded-xl border border-white/[0.06]">
+                        <div className="flex justify-between font-mono text-[10px] text-slate-300">
+                          <span>Focal Depth (f)</span>
+                          <span className="text-[#00ffd1] font-bold">{gConfig.focalLength}</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="320"
+                          max="620"
+                          step="10"
+                          value={gConfig.focalLength}
+                          onChange={(e) => updateConfig({ focalLength: parseInt(e.target.value, 10) })}
+                          className="w-full accent-[#00ffd1] cursor-pointer h-1.5 bg-white/10 rounded-lg appearance-none"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Color Palette & Actions */}
+                    <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
+                      {/* Palette Chips */}
+                      <div className="flex items-center gap-1.5 font-mono text-[10px]">
+                        <span className="text-slate-400 mr-1">Shader Theme:</span>
+                        {(["cyan", "violet", "emerald", "amber"] as WireColor[]).map((c) => (
+                          <button
+                            key={c}
+                            onClick={() => updateConfig({ wireColor: c })}
+                            className={`px-2 py-0.5 rounded capitalize transition-all text-[10px] ${
+                              gConfig.wireColor === c
+                                ? "bg-white/20 text-white font-bold border border-white/40 shadow-sm"
+                                : "bg-black/30 text-slate-400 hover:text-white border border-white/5"
+                            }`}
+                          >
+                            {c}
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={triggerPulse}
+                          className="flex items-center gap-1.5 rounded-lg border border-[#00ffd1]/40 bg-[#00ffd1]/10 px-3 py-1 font-mono text-[10px] font-bold text-[#00ffd1] hover:bg-[#00ffd1]/20 hover:scale-105 active:scale-95 transition-all shadow-[0_0_12px_rgba(0,255,209,0.2)]"
+                        >
+                          <Zap size={11} />
+                          <span>Fire Seismic Wave</span>
+                        </button>
+
+                        <button
+                          onClick={resetConfig}
+                          className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 font-mono text-[10px] text-slate-400 hover:text-white transition-colors"
+                          title="Reset graphics parameters to defaults"
+                        >
+                          <RotateCcw size={11} />
+                          <span>Reset</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Status Bar */}
                 <div className="flex items-center justify-between border-t border-white/[0.06] bg-black/50 px-4 py-2 text-[10px] font-mono text-slate-400">
