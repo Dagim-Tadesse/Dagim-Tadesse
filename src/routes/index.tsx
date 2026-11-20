@@ -700,7 +700,6 @@ function Portfolio() {
         className="relative flex min-h-[92vh] items-center overflow-hidden pt-28 pb-16"
       >
         {/* Background Atmosphere */}
-        <div className="absolute inset-0 grid-bg opacity-30" aria-hidden />
         <div className="absolute inset-0 radial-glow" aria-hidden />
         <div className="absolute inset-0 radial-glow-violet" aria-hidden />
         <div

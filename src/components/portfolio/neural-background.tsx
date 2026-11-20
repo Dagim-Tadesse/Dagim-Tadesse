@@ -132,11 +132,11 @@ export function NeuralBackground() {
     let lastFpsUpdate = performance.now();
     let frameCount = 0;
 
-    // 3D Terrain Grid Configuration
-    const GRID_COLS = 26; // Longitudinal lines
-    const GRID_ROWS = 18; // Latitudinal depth rings
-    const Z_NEAR = 90;
-    const Z_FAR = 780;
+    // 3D Terrain Grid Configuration (Perspective Cyber Horizon)
+    const GRID_COLS = 32; // Longitudinal lines
+    const GRID_ROWS = 22; // Latitudinal depth rings
+    const Z_NEAR = 80;
+    const Z_FAR = 760;
 
     const render = (now: number) => {
       time += 0.018;
@@ -164,8 +164,8 @@ export function NeuralBackground() {
         height * 0.5,
         width * 0.75,
       );
-      ambientGlow.addColorStop(0, "rgba(0, 255, 209, 0.04)");
-      ambientGlow.addColorStop(0.35, "rgba(139, 92, 246, 0.025)");
+      ambientGlow.addColorStop(0, "rgba(0, 255, 209, 0.05)");
+      ambientGlow.addColorStop(0.35, "rgba(139, 92, 246, 0.03)");
       ambientGlow.addColorStop(1, "rgba(7, 9, 14, 0)");
       ctx.fillStyle = ambientGlow;
       ctx.fillRect(0, 0, width, height);
@@ -174,11 +174,36 @@ export function NeuralBackground() {
       // LAYER 1: 3D UNDULATING PERSPECTIVE WIREFRAME GRID (CYBER HORIZON TERRAIN)
       // =========================================================================
       if (terrainMode !== "off") {
-        const horizonY = height * 0.58;
-        const groundOffset = 135;
-        const intensityMul = terrainMode === "cyber" ? 1.0 : 0.45;
+        const horizonY = height * 0.56;
+        const groundOffset = 140;
+        const intensityMul = terrainMode === "cyber" ? 1.0 : 0.5;
 
-        // Compute vertex matrix [row][col] in 3D perspective space
+        // 1. HORIZON CORE ATMOSPHERE & GLOWING HORIZON LINE
+        const horizonGrad = ctx.createLinearGradient(0, horizonY, width, horizonY);
+        horizonGrad.addColorStop(0, "rgba(0, 255, 209, 0)");
+        horizonGrad.addColorStop(0.2, `rgba(0, 255, 209, ${0.45 * intensityMul})`);
+        horizonGrad.addColorStop(0.5, `rgba(0, 255, 209, ${0.85 * intensityMul})`);
+        horizonGrad.addColorStop(0.8, `rgba(168, 85, 247, ${0.45 * intensityMul})`);
+        horizonGrad.addColorStop(1, "rgba(168, 85, 247, 0)");
+
+        ctx.beginPath();
+        ctx.moveTo(0, horizonY);
+        ctx.lineTo(width, horizonY);
+        ctx.strokeStyle = horizonGrad;
+        ctx.lineWidth = 1.8;
+        ctx.stroke();
+
+        // Soft ambient horizon sun arc
+        const sunGrad = ctx.createRadialGradient(width * 0.5, horizonY, 5, width * 0.5, horizonY, 220);
+        sunGrad.addColorStop(0, `rgba(0, 255, 209, ${0.18 * intensityMul})`);
+        sunGrad.addColorStop(0.4, `rgba(139, 92, 246, ${0.1 * intensityMul})`);
+        sunGrad.addColorStop(1, "rgba(7, 9, 14, 0)");
+        ctx.fillStyle = sunGrad;
+        ctx.beginPath();
+        ctx.arc(width * 0.5, horizonY, 220, Math.PI, Math.PI * 2);
+        ctx.fill();
+
+        // 2. COMPUTE 3D PERSPECTIVE VERTEX MATRIX [row][col]
         const gridVertices: {
           x: number;
           y: number;
@@ -187,7 +212,7 @@ export function NeuralBackground() {
           alpha: number;
         }[][] = [];
 
-        const terrainWidth = width * 1.85;
+        const terrainWidth = width * 1.95;
         const stepX = terrainWidth / (GRID_COLS - 1);
 
         for (let r = 0; r < GRID_ROWS; r++) {
@@ -199,47 +224,46 @@ export function NeuralBackground() {
             alpha: number;
           }[] = [];
 
-          // Non-linear depth distribution to stretch perspective toward horizon
           const depthRatio = r / (GRID_ROWS - 1);
-          const z = Z_NEAR + Math.pow(depthRatio, 1.35) * (Z_FAR - Z_NEAR);
+          const z = Z_NEAR + Math.pow(depthRatio, 1.3) * (Z_FAR - Z_NEAR);
           const scale = FOCAL_LENGTH / z;
-          const fogAlpha = Math.pow(1 - depthRatio, 1.45) * intensityMul;
+          const fogAlpha = Math.pow(1 - depthRatio, 1.25) * intensityMul;
 
           for (let c = 0; c < GRID_COLS; c++) {
             const worldX = -terrainWidth / 2 + c * stepX;
 
-            // Trigonometric dual-harmonic terrain elevation
-            const wave1 = Math.sin(worldX * 0.005 + time * 1.2) * Math.cos(z * 0.007 + time * 0.9) * 26;
-            const wave2 = Math.sin((worldX * 0.009 - z * 0.0075) + time * 1.6) * 14;
+            // Dual harmonic wave elevation function
+            const wave1 = Math.sin(worldX * 0.005 + time * 1.3) * Math.cos(z * 0.007 + time * 1.0) * 32;
+            const wave2 = Math.sin((worldX * 0.009 - z * 0.008) + time * 1.7) * 16;
             let elevation = wave1 + wave2;
 
-            // Mouse interactive surface ripple
+            // Interactive mouse deflection ripple
             const approxProjX = width / 2 + worldX * scale;
-            const approxProjY = horizonY + (groundOffset - scrollY * 0.07) * scale;
+            const approxProjY = horizonY + (groundOffset - scrollY * 0.08) * scale;
             if (mouse.isActive) {
               const dMouse = Math.hypot(approxProjX - mouse.x, approxProjY - mouse.y);
-              if (dMouse < 240) {
-                const influence = Math.pow(1 - dMouse / 240, 2);
-                elevation += Math.sin(time * 5.5 - dMouse * 0.065) * 34 * influence;
+              if (dMouse < 260) {
+                const influence = Math.pow(1 - dMouse / 260, 2);
+                elevation += Math.sin(time * 6 - dMouse * 0.055) * 44 * influence;
               }
             }
 
             const projX = width / 2 + worldX * scale;
-            const projY = horizonY + (groundOffset + elevation - scrollY * 0.07 * (1 - depthRatio * 0.45)) * scale;
+            const projY = horizonY + (groundOffset + elevation - scrollY * 0.08 * (1 - depthRatio * 0.5)) * scale;
 
             rowVertices.push({
               x: projX,
               y: projY,
               z,
               elevation,
-              alpha: Math.max(0, Math.min(1, fogAlpha * 0.38)),
+              alpha: Math.max(0, Math.min(1, fogAlpha * 0.65)),
             });
           }
           gridVertices.push(rowVertices);
         }
 
-        // Draw longitudinal perspective lines (connecting foreground to horizon)
-        ctx.lineWidth = 0.9;
+        // 3. DRAW LONGITUDINAL WIRES (Connecting foreground to horizon)
+        ctx.lineWidth = 1.1;
         for (let c = 0; c < GRID_COLS; c++) {
           ctx.beginPath();
           for (let r = 0; r < GRID_ROWS; r++) {
@@ -250,18 +274,19 @@ export function NeuralBackground() {
           const startV = gridVertices[0][c];
           const endV = gridVertices[GRID_ROWS - 1][c];
           const grad = ctx.createLinearGradient(startV.x, startV.y, endV.x, endV.y);
-          grad.addColorStop(0, `rgba(0, 255, 209, ${0.45 * intensityMul})`);
-          grad.addColorStop(0.5, `rgba(56, 189, 248, ${0.22 * intensityMul})`);
+          grad.addColorStop(0, `rgba(0, 255, 209, ${0.72 * intensityMul})`);
+          grad.addColorStop(0.35, `rgba(56, 189, 248, ${0.45 * intensityMul})`);
+          grad.addColorStop(0.75, `rgba(168, 85, 247, ${0.2 * intensityMul})`);
           grad.addColorStop(1, "rgba(139, 92, 246, 0)");
           ctx.strokeStyle = grad;
           ctx.stroke();
         }
 
-        // Draw lateral contour rings
+        // 4. DRAW LATERAL CONTOUR RINGS
         for (let r = 0; r < GRID_ROWS; r++) {
           const row = gridVertices[r];
           const alpha = row[0].alpha;
-          if (alpha < 0.015) continue;
+          if (alpha < 0.02) continue;
 
           ctx.beginPath();
           for (let c = 0; c < GRID_COLS; c++) {
@@ -270,21 +295,33 @@ export function NeuralBackground() {
             else ctx.lineTo(v.x, v.y);
           }
           ctx.strokeStyle = `rgba(0, 255, 209, ${alpha})`;
-          ctx.lineWidth = 0.75;
+          ctx.lineWidth = 0.85;
           ctx.stroke();
         }
 
-        // Draw luminous vertex beacons on crests
+        // 5. LUMINOUS VERTEX BEACON MICRO-DIAMONDS
         if (terrainMode === "cyber") {
-          for (let r = 0; r < GRID_ROWS - 3; r += 2) {
+          for (let r = 0; r < GRID_ROWS - 2; r += 2) {
             for (let c = 0; c < GRID_COLS; c += 2) {
               const v = gridVertices[r][c];
-              if (v.elevation > 12 && v.alpha > 0.08) {
+              if (v.elevation > 14 && v.alpha > 0.12) {
+                // Diamond beacon
                 ctx.beginPath();
-                ctx.arc(v.x, v.y, 1.4, 0, Math.PI * 2);
-                ctx.fillStyle = "#00ffd1";
-                ctx.globalAlpha = v.alpha * 1.6;
+                ctx.moveTo(v.x, v.y - 2);
+                ctx.lineTo(v.x + 2, v.y);
+                ctx.lineTo(v.x, v.y + 2);
+                ctx.lineTo(v.x - 2, v.y);
+                ctx.closePath();
+                ctx.fillStyle = "#ffffff";
+                ctx.globalAlpha = v.alpha * 1.5;
                 ctx.fill();
+
+                // Cyan halo ring
+                ctx.beginPath();
+                ctx.arc(v.x, v.y, 3.5, 0, Math.PI * 2);
+                ctx.strokeStyle = "rgba(0, 255, 209, 0.4)";
+                ctx.lineWidth = 0.6;
+                ctx.stroke();
               }
             }
           }
