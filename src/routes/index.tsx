@@ -741,7 +741,7 @@ function Portfolio() {
       {/* HERO SECTION */}
       <section
         id="home"
-        className="relative flex min-h-[92vh] items-center overflow-hidden pt-28 pb-16"
+        className="relative flex min-h-[85vh] sm:min-h-[92vh] items-center overflow-hidden pt-20 pb-12 sm:pt-28 sm:pb-16"
       >
         {/* Background Atmosphere */}
         <div className="absolute inset-0 radial-glow" aria-hidden />
@@ -959,8 +959,8 @@ function Portfolio() {
       </div>
 
       {/* ABOUT & PHILOSOPHY SECTION (COMPLETELY DE-CARDED & EDITORIAL) */}
-      <section id="about" className="relative scroll-mt-24 pt-12 pb-24">
-        <div className="mx-auto max-w-6xl px-5 space-y-16">
+      <section id="about" className="relative scroll-mt-24 pt-10 pb-16 sm:pt-12 sm:pb-24">
+        <div className="mx-auto max-w-6xl px-5 space-y-10 sm:space-y-16">
           <SectionHeading kicker="01 // Identity & Manifesto" title="Engineering Systems that Ship" />
 
           {/* Narrative & Human Story (NO BOXES) */}
@@ -1113,7 +1113,7 @@ function Portfolio() {
       </section>
 
       {/* SELECTED WORK SECTION: INTERACTIVE PROJECT THEATER (No more generic card stacks) */}
-      <section id="projects" className="relative scroll-mt-24 pt-16 pb-28">
+      <section id="projects" className="relative scroll-mt-24 pt-10 pb-16 sm:pt-16 sm:pb-28">
         <div className="mx-auto max-w-6xl px-5">
           <SectionHeading
             kicker="02 // Interactive Project Studio"
@@ -1129,7 +1129,7 @@ function Portfolio() {
       </section>
 
       {/* TECHNICAL TOOLKIT & WORKBENCH (No more generic card stacks) */}
-      <section id="skills" className="relative scroll-mt-24 pt-16 pb-28">
+      <section id="skills" className="relative scroll-mt-24 pt-10 pb-16 sm:pt-16 sm:pb-28">
         <div className="mx-auto max-w-6xl px-5">
           <SectionHeading
             kicker="03 // Architecture Workbench"
@@ -1145,8 +1145,8 @@ function Portfolio() {
       </section>
 
       {/* EXPERIENCE & ACHIEVEMENTS: ILLUMINATED VERTICAL MILESTONE SPINE (NO CARDS) */}
-      <section id="experience" className="relative scroll-mt-24 pt-16 pb-28">
-        <div className="mx-auto max-w-5xl px-5 space-y-12">
+      <section id="experience" className="relative scroll-mt-24 pt-10 pb-16 sm:pt-16 sm:pb-28">
+        <div className="mx-auto max-w-5xl px-5 space-y-8 sm:space-y-12">
           <SectionHeading kicker="04 // Career Journey" title="Experience & Proven Milestones" />
 
           {/* Central Illuminated Chronological Spine with Interactive Parallax Kinetic Beam */}
@@ -1157,7 +1157,7 @@ function Portfolio() {
       </section>
 
       {/* CONTACT & GET IN TOUCH */}
-      <section id="contact" className="relative scroll-mt-24 pt-16 pb-28">
+      <section id="contact" className="relative scroll-mt-24 pt-10 pb-16 sm:pt-16 sm:pb-28">
         <div className="mx-auto max-w-4xl px-5 text-center">
           <SectionHeading
             kicker="05 // Human Connection"

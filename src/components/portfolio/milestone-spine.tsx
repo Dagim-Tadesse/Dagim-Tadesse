@@ -123,7 +123,7 @@ export function MilestoneSpine() {
   });
 
   return (
-    <div ref={containerRef} className="relative pl-10 sm:pl-14 space-y-16">
+    <div ref={containerRef} className="relative pl-10 sm:pl-14 space-y-10 sm:space-y-16">
       {/* 1. CONTINUOUS BACKGROUND TRACK */}
       <div
         className="absolute left-3.5 sm:left-4 top-3 bottom-3 w-[2px] bg-white/[0.08]"

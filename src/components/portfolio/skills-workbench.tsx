@@ -245,6 +245,7 @@ export function SkillsWorkbench() {
   const [activeTab, setActiveTab] = useState<string>("ai");
   const [direction, setDirection] = useState(1);
   const [copied, setCopied] = useState(false);
+  const [showMobileCode, setShowMobileCode] = useState(false);
   const [gConfig, setGConfig] = useState<GraphicsConfig>(graphicsStore.get());
 
   useEffect(() => {
@@ -403,10 +404,26 @@ export function SkillsWorkbench() {
                   </div>
                 ))}
               </div>
+
+              {/* Mobile Code Toggle for non-graphics pillars */}
+              {pillar.id !== "graphics" && (
+                <div className="lg:hidden pt-2">
+                  <button
+                    onClick={() => {
+                      sfx.playSwitch();
+                      setShowMobileCode(!showMobileCode);
+                    }}
+                    className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 font-mono text-xs text-slate-300 hover:border-[#00ffd1]/50 hover:text-white transition-all shadow-sm"
+                  >
+                    <FileCode size={13} style={{ color: pillar.accentColor }} />
+                    <span>{showMobileCode ? "Hide Code Blueprint" : `Inspect ${pillar.codeFileName}`}</span>
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Right Pane: Production Architecture Code Blueprint Window */}
-            <div className="lg:col-span-7 relative">
+            <div className={`lg:col-span-7 relative ${pillar.id !== "graphics" && !showMobileCode ? "hidden lg:block" : "block"}`}>
               {/* Radial glow bloom */}
               <div
                 className="pointer-events-none absolute -inset-6 rounded-full blur-3xl opacity-15"

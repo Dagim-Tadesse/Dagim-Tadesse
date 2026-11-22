@@ -272,7 +272,7 @@ export function InteractiveCube({ onNavigate, onOpenCommandMenu }: InteractiveCu
 
       {/* 3D CUBE STAGE */}
       <div
-        className="relative my-4 flex h-[310px] w-full items-center justify-center cursor-grab active:cursor-grabbing touch-none"
+        className="relative my-2 sm:my-4 flex h-[250px] sm:h-[310px] w-full items-center justify-center cursor-grab active:cursor-grabbing touch-none"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}

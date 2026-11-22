@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import {
   ExternalLink,
   Github,
@@ -162,8 +162,36 @@ const ARCHIVE_PROJECTS = [
 ];
 
 export function ProjectTheater() {
+  const containerRef = useRef<HTMLDivElement>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(1);
+  const touchStartX = useRef<number | null>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"],
+  });
+
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 160,
+    damping: 26,
+    restDelta: 0.001,
+  });
+
+  // Sticky Scroll Scrubbing on Desktop (>= 768px)
+  useEffect(() => {
+    return scrollYProgress.on("change", (latest) => {
+      if (typeof window === "undefined" || window.innerWidth < 768) return;
+      const count = FLAGSHIP_PROJECTS.length;
+      // Map progress across projects
+      const idx = Math.min(count - 1, Math.floor(latest * count));
+      if (idx !== currentIndex) {
+        setDirection(idx > currentIndex ? 1 : -1);
+        setCurrentIndex(idx);
+        sfx.playTick(1.0 + idx * 0.1);
+      }
+    });
+  }, [currentIndex, scrollYProgress]);
 
   const setProject = (index: number) => {
     sfx.playSnap();
@@ -181,6 +209,22 @@ export function ProjectTheater() {
     sfx.playTick(0.9);
     setDirection(-1);
     setCurrentIndex((prev) => (prev - 1 + FLAGSHIP_PROJECTS.length) % FLAGSHIP_PROJECTS.length);
+  };
+
+  // Mobile Touch-Swipe Handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    if (diff > 45) {
+      nextProject();
+    } else if (diff < -45) {
+      prevProject();
+    }
+    touchStartX.current = null;
   };
 
   const project = FLAGSHIP_PROJECTS[currentIndex];
@@ -215,71 +259,98 @@ export function ProjectTheater() {
   };
 
   return (
-    <div className="space-y-12">
-      {/* 1. HORIZONTAL CINEMATIC SELECTOR (NO CARD BOXES) */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/[0.08] pb-4">
-        {/* Step indicator */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-          {FLAGSHIP_PROJECTS.map((p, idx) => {
-            const isSelected = idx === currentIndex;
-            return (
+    <div ref={containerRef} className="relative md:h-[300vh]">
+      {/* Sticky Viewport Stage on Desktop, natural flow on Mobile */}
+      <div
+        className="md:sticky md:top-24 space-y-6 md:space-y-8"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        {/* 1. HORIZONTAL CINEMATIC SELECTOR (NO CARD BOXES) */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-white/[0.08] pb-3">
+          {/* Step indicator */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+            {FLAGSHIP_PROJECTS.map((p, idx) => {
+              const isSelected = idx === currentIndex;
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => setProject(idx)}
+                  className={`group relative flex items-center gap-2.5 rounded-full px-3.5 py-1.5 font-mono text-xs uppercase tracking-wider transition-all duration-300 ${
+                    isSelected
+                      ? "text-slate-950 font-bold"
+                      : "text-slate-400 hover:text-white hover:bg-white/5"
+                  }`}
+                >
+                  {/* Smooth sliding pill cursor */}
+                  {isSelected && (
+                    <motion.div
+                      layoutId="activeHorizonPill"
+                      className="absolute inset-0 rounded-full"
+                      style={{
+                        background: `linear-gradient(135deg, ${p.accentColor} 0%, #38bdf8 100%)`,
+                        boxShadow: `0 0 25px ${p.accentColor}55`,
+                      }}
+                      transition={{ type: "spring", stiffness: 450, damping: 32 }}
+                    />
+                  )}
+                  <span className="relative z-10">{p.number}</span>
+                  <span className="relative z-10 hidden md:inline">{p.name.split(" ")[0]}</span>
+                  {isSelected && (
+                    <span className="relative z-10 text-[10px] opacity-90 hidden sm:inline">
+                      · Active
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Controls, Telemetry & Hints */}
+          <div className="flex items-center justify-between sm:justify-end gap-3 self-stretch sm:self-auto">
+            {/* Desktop Scrub Telemetry */}
+            <span className="hidden md:inline-flex items-center gap-1.5 font-mono text-[11px] text-[#00ffd1] bg-[#00ffd1]/10 px-2.5 py-0.5 rounded-full border border-[#00ffd1]/30">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#00ffd1] animate-pulse" />
+              Scroll to scrub
+            </span>
+
+            {/* Mobile Swipe Hint */}
+            <span className="md:hidden font-mono text-[11px] text-slate-400">
+              ‹ Swipe to explore ›
+            </span>
+
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-xs text-slate-400 mr-1">
+                {currentIndex + 1} / {FLAGSHIP_PROJECTS.length}
+              </span>
               <button
-                key={p.id}
-                onClick={() => setProject(idx)}
-                className={`group relative flex items-center gap-2.5 rounded-full px-4 py-2 font-mono text-xs uppercase tracking-wider transition-all duration-300 ${
-                  isSelected
-                    ? "text-slate-950 font-bold"
-                    : "text-slate-400 hover:text-white hover:bg-white/5"
-                }`}
+                onClick={prevProject}
+                aria-label="Previous project"
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-300 transition-colors hover:border-[#00ffd1] hover:text-[#00ffd1]"
               >
-                {/* Smooth sliding pill cursor */}
-                {isSelected && (
-                  <motion.div
-                    layoutId="activeHorizonPill"
-                    className="absolute inset-0 rounded-full"
-                    style={{
-                      background: `linear-gradient(135deg, ${p.accentColor} 0%, #38bdf8 100%)`,
-                      boxShadow: `0 0 25px ${p.accentColor}55`,
-                    }}
-                    transition={{ type: "spring", stiffness: 450, damping: 32 }}
-                  />
-                )}
-                <span className="relative z-10">{p.number}</span>
-                <span className="relative z-10 hidden md:inline">{p.name.split(" ")[0]}</span>
-                {isSelected && (
-                  <span className="relative z-10 text-[10px] opacity-90 hidden sm:inline">
-                    · Active
-                  </span>
-                )}
+                <ChevronLeft size={15} />
               </button>
-            );
-          })}
+              <button
+                onClick={nextProject}
+                aria-label="Next project"
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-300 transition-colors hover:border-[#00ffd1] hover:text-[#00ffd1]"
+              >
+                <ChevronRight size={15} />
+              </button>
+            </div>
+          </div>
         </div>
 
-        {/* Prev / Next controls */}
-        <div className="flex items-center gap-2 self-end sm:self-auto">
-          <span className="font-mono text-xs text-slate-500 mr-2">
-            {currentIndex + 1} / {FLAGSHIP_PROJECTS.length}
-          </span>
-          <button
-            onClick={prevProject}
-            aria-label="Previous project"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-300 transition-colors hover:border-[#00ffd1] hover:text-[#00ffd1]"
-          >
-            <ChevronLeft size={16} />
-          </button>
-          <button
-            onClick={nextProject}
-            aria-label="Next project"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-300 transition-colors hover:border-[#00ffd1] hover:text-[#00ffd1]"
-          >
-            <ChevronRight size={16} />
-          </button>
+        {/* Desktop Sticky Laser Progress Bar */}
+        <div className="hidden md:block relative h-[2px] w-full bg-white/[0.06] overflow-hidden -mt-5">
+          <motion.div
+            style={{ scaleX: smoothProgress }}
+            className="absolute inset-0 origin-left bg-gradient-to-r from-[#00ffd1] via-[#38bdf8] to-[#fbbf24] shadow-[0_0_12px_rgba(0,255,209,0.7)]"
+          />
         </div>
-      </div>
 
-      {/* 2. THE MAIN STAGE: DE-CARDED FULL-BLEED LIVING THEATER */}
-      <div className="relative min-h-[480px]">
+        {/* 2. THE MAIN STAGE: DE-CARDED FULL-BLEED LIVING THEATER */}
+        <div className="relative min-h-[460px] md:min-h-[490px]">
         <AnimatePresence custom={direction} mode="wait">
           <motion.div
             key={project.id}
@@ -428,9 +499,10 @@ export function ProjectTheater() {
           </motion.div>
         </AnimatePresence>
       </div>
+    </div>
 
-      {/* 3. SECONDARY OPEN-SOURCE ARCHIVE: STREAM LIST (NO CARD BOXES) */}
-      <div className="pt-12 border-t border-white/[0.08] space-y-4">
+    {/* 3. SECONDARY OPEN-SOURCE ARCHIVE: STREAM LIST (NO CARD BOXES) */}
+    <div className="pt-12 md:pt-16 border-t border-white/[0.08] space-y-4">
         <div className="flex items-center justify-between">
           <h4 className="font-mono text-xs uppercase tracking-widest text-slate-400">
             // Additional Engineering Repositories & Academic Works
