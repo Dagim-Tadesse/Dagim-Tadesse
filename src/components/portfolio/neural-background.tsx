@@ -33,6 +33,11 @@ export function NeuralBackground() {
   const [terrainMode, setTerrainMode] = useState<TerrainMode>("cyber");
   const [fps, setFps] = useState<number>(60);
   const [showHud, setShowHud] = useState<boolean>(false);
+  const showHudRef = useRef(showHud);
+
+  useEffect(() => {
+    showHudRef.current = showHud;
+  }, [showHud]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -139,12 +144,25 @@ export function NeuralBackground() {
     const Z_NEAR = 80;
     const Z_FAR = 760;
 
+    // Visibility listener to pause rendering when document is in background
+    let isVisible = true;
+    const handleVisibility = () => {
+      isVisible = !document.hidden;
+      if (isVisible) lastFpsUpdate = performance.now();
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
     const render = (now: number) => {
+      if (!isVisible) {
+        animationFrameId = requestAnimationFrame(render);
+        return;
+      }
+
       const gCfg = graphicsStore.get();
       time += 0.014 * gCfg.waveSpeed;
       frameCount++;
 
-      if (now - lastFpsUpdate >= 1000) {
+      if (showHudRef.current && now - lastFpsUpdate >= 1000) {
         setFps(Math.round((frameCount * 1000) / (now - lastFpsUpdate)));
         frameCount = 0;
         lastFpsUpdate = now;
@@ -586,6 +604,7 @@ export function NeuralBackground() {
       window.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseleave", handleMouseLeave);
       window.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("visibilitychange", handleVisibility);
     };
   }, [terrainMode]);
 

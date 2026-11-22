@@ -15,6 +15,7 @@ import { PriceGuardChart } from "@/components/portfolio/priceguard-chart";
 import { CrmPipelineVisualizer } from "@/components/portfolio/crm-pipeline";
 import { GebeyaMockup } from "@/components/portfolio/gebeya-mockup";
 import { SpendWiseWidget } from "@/components/portfolio/spendwise-widget";
+import { sfx } from "@/lib/sound-effects";
 
 interface ProjectShowcase {
   id: string;
@@ -165,16 +166,19 @@ export function ProjectTheater() {
   const [direction, setDirection] = useState(1);
 
   const setProject = (index: number) => {
+    sfx.playSnap();
     setDirection(index > currentIndex ? 1 : -1);
     setCurrentIndex(index);
   };
 
   const nextProject = () => {
+    sfx.playTick(1.2);
     setDirection(1);
     setCurrentIndex((prev) => (prev + 1) % FLAGSHIP_PROJECTS.length);
   };
 
   const prevProject = () => {
+    sfx.playTick(0.9);
     setDirection(-1);
     setCurrentIndex((prev) => (prev - 1 + FLAGSHIP_PROJECTS.length) % FLAGSHIP_PROJECTS.length);
   };
@@ -365,6 +369,7 @@ export function ProjectTheater() {
                         href={project.liveUrl}
                         target="_blank"
                         rel="noreferrer noopener"
+                        onClick={() => sfx.playSuccess()}
                         className="inline-flex items-center gap-2 rounded-full px-6 py-3 font-mono text-xs font-bold uppercase tracking-wider text-slate-950 transition-all hover:scale-105 active:scale-95"
                         style={{
                           background: `linear-gradient(135deg, ${project.accentColor} 0%, #38bdf8 100%)`,
@@ -381,6 +386,7 @@ export function ProjectTheater() {
                         href={project.githubUrl}
                         target="_blank"
                         rel="noreferrer noopener"
+                        onClick={() => sfx.playSuccess()}
                         className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 font-mono text-xs font-semibold uppercase tracking-wider text-slate-200 transition-colors hover:border-[#00ffd1]/50 hover:bg-white/10"
                       >
                         <Github size={15} />

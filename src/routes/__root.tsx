@@ -75,29 +75,41 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Dagim Tadesse — Software Engineer & AI/ML Developer" },
+      { title: "Dagim Tadesse — Software Engineer · AI/ML Developer · Tech Lead" },
       {
         name: "description",
         content:
-          "Portfolio of Dagim Tadesse — Software Engineering student at AASTU building at the intersection of AI, data, and real software.",
+          "Portfolio of Dagim Tadesse — Software Engineer & AI/ML Developer specializing in Clean Architecture backends, LLM prompt pipelines, and modern full-stack systems. GDG Hackathon Winner & Africom Tech Lead.",
       },
       { name: "author", content: "Dagim Tadesse" },
-      { property: "og:title", content: "Dagim Tadesse — Software Engineer & AI/ML Developer" },
+      {
+        name: "keywords",
+        content:
+          "Dagim Tadesse, Software Engineer, AI Developer, Machine Learning, ASP.NET Core, Clean Architecture, React, TypeScript, Flutter, GDG Hackathon Winner, Addis Ababa, Ethiopia",
+      },
+      { property: "og:title", content: "Dagim Tadesse — Software Engineer · AI/ML Developer · Tech Lead" },
       {
         property: "og:description",
         content:
-          "Building at the intersection of AI, data, and real software. Open to internships.",
+          "Software Engineer & AI/ML Developer specializing in Clean Architecture backends, LLM prompt pipelines, and modern full-stack systems. GDG Hackathon Winner & Africom Tech Lead.",
       },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Dagim Tadesse — Software Engineer & AI/ML Developer" },
-      { name: "description", content: "Dagim's Digital Canvas is a personal portfolio website showcasing a Software Engineering student's skills." },
-      { property: "og:description", content: "Dagim's Digital Canvas is a personal portfolio website showcasing a Software Engineering student's skills." },
-      { name: "twitter:description", content: "Dagim's Digital Canvas is a personal portfolio website showcasing a Software Engineering student's skills." },
+      { property: "og:url", content: "https://dagim-tadesse.vercel.app" },
       { property: "og:image", content: "https://dagim-tadesse.vercel.app/og-image.jpeg?v=2" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Dagim Tadesse — Software Engineer · AI/ML Developer · Tech Lead" },
+      {
+        name: "twitter:description",
+        content:
+          "Software Engineer & AI/ML Developer specializing in Clean Architecture backends, LLM prompt pipelines, and modern full-stack systems. GDG Hackathon Winner & Africom Tech Lead.",
+      },
       { name: "twitter:image", content: "https://dagim-tadesse.vercel.app/og-image.jpeg?v=2" },
     ],
     links: [
+      {
+        rel: "canonical",
+        href: "https://dagim-tadesse.vercel.app",
+      },
       {
         rel: "preconnect",
         href: "https://fonts.googleapis.com",
